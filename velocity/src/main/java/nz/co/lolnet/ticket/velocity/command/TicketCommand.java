@@ -27,6 +27,7 @@ import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.CommandManager;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -42,6 +43,11 @@ public class TicketCommand implements Command {
             textBuilder.append(TextComponent.of("/" + Reference.ID + " help ", TextColor.GREEN));
             textBuilder.append(TextComponent.of("to view available commands.", TextColor.BLUE));
             source.sendMessage(textBuilder.build());
+            return;
+        }
+        
+        if (StringUtils.isBlank(command.getPermission()) || !source.hasPermission(command.getPermission())) {
+            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
             return;
         }
         

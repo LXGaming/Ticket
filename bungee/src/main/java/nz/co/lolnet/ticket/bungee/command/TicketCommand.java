@@ -26,6 +26,7 @@ import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.CommandManager;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -45,6 +46,11 @@ public class TicketCommand extends Command {
             componentBuilder.append("/" + Reference.ID + " help ").color(ChatColor.GREEN);
             componentBuilder.append("to view available commands.").color(ChatColor.BLUE);
             sender.sendMessage(componentBuilder.create());
+            return;
+        }
+        
+        if (StringUtils.isBlank(command.getPermission()) || !sender.hasPermission(command.getPermission())) {
+            sender.sendMessage(new ComponentBuilder("You do not have permission to execute this command!").color(ChatColor.RED).create());
             return;
         }
         
