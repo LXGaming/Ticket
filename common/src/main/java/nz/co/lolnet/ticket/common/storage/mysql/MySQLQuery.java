@@ -210,8 +210,8 @@ public class MySQLQuery {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
             storageAdapter.createConnection().prepareStatement("SELECT * FROM `ticket` WHERE `user` = ? AND `status` = ? AND `read` = ?");
             storageAdapter.getPreparedStatement().setString(1, uniqueId.toString());
-            storageAdapter.getPreparedStatement().setInt(1, 1);
-            storageAdapter.getPreparedStatement().setInt(1, 0);
+            storageAdapter.getPreparedStatement().setInt(2, 1);
+            storageAdapter.getPreparedStatement().setInt(3, 0);
             ResultSet resultSet = storageAdapter.execute();
             
             Set<TicketData> tickets = Sets.newHashSet();

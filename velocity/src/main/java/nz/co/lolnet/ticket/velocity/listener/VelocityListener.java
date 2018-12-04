@@ -19,32 +19,52 @@ package nz.co.lolnet.ticket.velocity.listener;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.Ticket;
+import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.common.TicketImpl;
+import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
+import nz.co.lolnet.ticket.velocity.VelocityPlugin;
+import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class VelocityListener {
     
     @Subscribe
     public void onPostLogin(PostLoginEvent event) {
-        Ticket.getInstance().getLogger().info("onPostLogin");
-        UserData user = DataManager.getUser(event.getPlayer().getUniqueId()).orElse(null);
-        if (user == null) {
-            return;
-        }
-        
-        if (!user.getName().equals(event.getPlayer().getUsername())) {
-            user.setName(event.getPlayer().getUsername());
-            MySQLQuery.updateUser(user);
-        }
-        
-        // TODO Handle Open Tickets.
+        VelocityPlugin.getInstance().getProxy().getScheduler().buildTask(VelocityPlugin.getInstance(), () -> {
+            UserData user = DataManager.getUser(event.getPlayer().getUniqueId()).orElse(null);
+            if (user == null) {
+                return;
+            }
+            
+            if (!StringUtils.equals(user.getName(), event.getPlayer().getUsername())) {
+                Ticket.getInstance().getLogger().debug("Updating username: {} -> {}", user.getName(), event.getPlayer().getUsername());
+                user.setName(event.getPlayer().getUsername());
+                if (!MySQLQuery.updateUser(user)) {
+                    Ticket.getInstance().getLogger().warn("Failed to update {} ({})", user.getName(), user.getUniqueId());
+                }
+            }
+            
+            Set<TicketData> tickets = DataManager.getUnreadTickets(user.getUniqueId()).orElse(null);
+            if (tickets == null || tickets.isEmpty()) {
+                return;
+            }
+            
+            event.getPlayer().sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You have " + tickets.size() + " unread tickets", TextColor.GOLD)));
+        }).delay(TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS).schedule();
     }
     
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
-        Ticket.getInstance().getLogger().info("onPlayerDisconnect");
-        DataManager.getCachedUser(event.getPlayer().getUniqueId()).orElse(null);
+        // Forces the expiry to be recalculated
+        DataManager.getCachedUser(event.getPlayer().getUniqueId());
     }
 }
