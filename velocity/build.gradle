@@ -1,0 +1,106 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:2.0.4")
+    }
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "java"
+apply plugin: "signing"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = "nz.co.lolnet"
+archivesBaseName = "ticket-velocity"
+version = "1.0.0-DEV"
+
+configurations {
+    provided {
+        compile.extendsFrom(provided)
+    }
+
+    jar.enabled = false
+    jar.dependsOn("shadowJar")
+}
+
+repositories {
+    jcenter()
+    maven {
+        name = "lolnet"
+        url = "https://api.lolnet.co.nz/maven"
+    }
+    maven {
+        name = "velocity"
+        url = "https://repo.velocitypowered.com/snapshots"
+    }
+}
+
+dependencies {
+    shadow(project(path: ":common", configuration: "shadow"))
+    annotationProcessor("com.velocitypowered:velocity-api:1.0-SNAPSHOT")
+    provided("com.velocitypowered:velocity-api:1.0-SNAPSHOT")
+    provided("nz.co.lolnet:location-api:1.0.0")
+    provided("nz.co.lolnet:redisvelocity-api:1.0.0-DEV")
+}
+
+shadowJar {
+    classifier = null
+    configurations = [project.configurations.shadow]
+    relocate("com.github.benmanes.caffeine", "nz.co.lolnet.ticket.lib.caffeine")
+    relocate("com.mysql", "nz.co.lolnet.ticket.lib.mysql")
+    relocate("com.zaxxer.hikari", "nz.co.lolnet.ticket.lib.hikari")
+    relocate("org.apache.commons.lang3", "nz.co.lolnet.ticket.lib.lang3")
+    relocate("org.gjt", "nz.co.lolnet.ticket.lib.gjt")
+}
+
+jar {
+    from {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
+            it.isDirectory() ? it : zipTree(it)
+        })
+    }
+}
+
+processResources {
+    from("LICENSE")
+    rename("LICENSE", "LICENSE-" + archivesBaseName)
+}
+
+task signJar {
+    doFirst {
+        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
+            project.logger.warn("========== [WARNING] ==========")
+            project.logger.warn("")
+            project.logger.warn("   This build is not signed!   ")
+            project.logger.warn("")
+            project.logger.warn("========== [WARNING] ==========")
+            throw new StopExecutionException()
+        }
+    }
+
+    doLast {
+        jar.outputs.files.each {
+            ant.signjar(
+                jar: it,
+                alias: project.property("signing.alias"),
+                storepass: project.property("signing.keyStorePassword"),
+                keystore: project.property("signing.keyStorePath"),
+                keypass: project.property("signing.keyStorePassword"),
+                preservelastmodified: project.property("signing.preserveLastModified"),
+                tsaurl: project.property("signing.timestampAuthority"),
+                digestalg: project.property("signing.digestAlgorithm")
+            )
+            project.logger.lifecycle("JAR Signed: " + it.name)
+
+            signing.sign(it)
+            project.logger.lifecycle("PGP Signed: " + it.name)
+        }
+    }
+}

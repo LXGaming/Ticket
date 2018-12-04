@@ -1,0 +1,100 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:2.0.4")
+    }
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "java"
+apply plugin: "signing"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = "nz.co.lolnet"
+archivesBaseName = "ticket-common"
+version = "1.0.0-DEV"
+
+configurations {
+    provided {
+        compile.extendsFrom(provided)
+    }
+
+    jar.enabled = false
+    jar.dependsOn("shadowJar")
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    shadow(project(path: ":api"))
+    shadow("com.github.ben-manes.caffeine:caffeine:2.6.2")
+    provided("com.google.code.gson:gson:2.8.5")
+    provided("com.google.guava:guava:27.0-jre")
+    shadow("com.zaxxer:HikariCP:2.6.3") {
+        exclude(module: "slf4j-api")
+    }
+    
+    shadow("mysql:mysql-connector-java:5.1.47")
+    shadow("org.apache.commons:commons-lang3:3.8.1")
+}
+
+shadowJar {
+    classifier = null
+    configurations = [project.configurations.shadow]
+    exclude("server-ssl-cert.pem")
+    exclude("Version.java.template")
+}
+
+jar {
+    from {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
+            it.isDirectory() ? it : zipTree(it)
+        })
+    }
+}
+
+processResources {
+    from("LICENSE")
+    rename("LICENSE", "LICENSE-" + archivesBaseName)
+}
+
+task signJar {
+    doFirst {
+        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
+            project.logger.warn("========== [WARNING] ==========")
+            project.logger.warn("")
+            project.logger.warn("   This build is not signed!   ")
+            project.logger.warn("")
+            project.logger.warn("========== [WARNING] ==========")
+            throw new StopExecutionException()
+        }
+    }
+
+    doLast {
+        jar.outputs.files.each {
+            ant.signjar(
+                jar: it,
+                alias: project.property("signing.alias"),
+                storepass: project.property("signing.keyStorePassword"),
+                keystore: project.property("signing.keyStorePath"),
+                keypass: project.property("signing.keyStorePassword"),
+                preservelastmodified: project.property("signing.preserveLastModified"),
+                tsaurl: project.property("signing.timestampAuthority"),
+                digestalg: project.property("signing.digestAlgorithm")
+            )
+            project.logger.lifecycle("JAR Signed: " + it.name)
+
+            signing.sign(it)
+            project.logger.lifecycle("PGP Signed: " + it.name)
+        }
+    }
+}
