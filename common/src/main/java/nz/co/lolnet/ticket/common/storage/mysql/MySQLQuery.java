@@ -182,59 +182,39 @@ public class MySQLQuery {
         }
     }
     
-    public static Optional<Set<TicketData>> getOpenTickets() throws SQLException {
+    public static Optional<Set<Integer>> getOpenTickets() throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
-            storageAdapter.createConnection().prepareStatement("SELECT * FROM `ticket` WHERE `status` = ?");
+            storageAdapter.createConnection().prepareStatement("SELECT `id` FROM `ticket` WHERE `status` = ?");
             storageAdapter.getPreparedStatement().setInt(1, 0);
             ResultSet resultSet = storageAdapter.execute();
-            
-            Set<TicketData> tickets = Sets.newHashSet();
+            Set<Integer> ticketIds = Sets.newHashSet();
             while (resultSet.next()) {
-                TicketData ticket = new TicketData();
-                ticket.setId(resultSet.getInt("id"));
-                ticket.setUser(UUID.fromString(resultSet.getString("user")));
-                ticket.setTimestamp(resultSet.getTimestamp("timestamp").toInstant());
-                ticket.setLocation(Toolbox.parseJson(resultSet.getString("location"), LocationData.class).orElse(null));
-                ticket.setText(resultSet.getString("text"));
-                ticket.setStatus(resultSet.getInt("status"));
-                ticket.setRead(resultSet.getBoolean("read"));
-                ticket.setComments(Sets.newHashSet());
-                tickets.add(ticket);
+                ticketIds.add(resultSet.getInt("id"));
             }
             
-            return Optional.of(tickets);
+            return Optional.of(ticketIds);
         }
     }
     
-    public static Optional<Set<TicketData>> getUnreadTickets(UUID uniqueId) throws SQLException {
+    public static Optional<Set<Integer>> getUnreadTickets(UUID uniqueId) throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
-            storageAdapter.createConnection().prepareStatement("SELECT * FROM `ticket` WHERE `user` = ? AND `status` = ? AND `read` = ?");
+            storageAdapter.createConnection().prepareStatement("SELECT `id` FROM `ticket` WHERE `user` = ? AND `status` = ? AND `read` = ?");
             storageAdapter.getPreparedStatement().setString(1, uniqueId.toString());
             storageAdapter.getPreparedStatement().setInt(2, 1);
             storageAdapter.getPreparedStatement().setInt(3, 0);
             ResultSet resultSet = storageAdapter.execute();
-            
-            Set<TicketData> tickets = Sets.newHashSet();
+            Set<Integer> ticketIds = Sets.newHashSet();
             while (resultSet.next()) {
-                TicketData ticket = new TicketData();
-                ticket.setId(resultSet.getInt("id"));
-                ticket.setUser(UUID.fromString(resultSet.getString("user")));
-                ticket.setTimestamp(resultSet.getTimestamp("timestamp").toInstant());
-                ticket.setLocation(Toolbox.parseJson(resultSet.getString("location"), LocationData.class).orElse(null));
-                ticket.setText(resultSet.getString("text"));
-                ticket.setStatus(resultSet.getInt("status"));
-                ticket.setRead(resultSet.getBoolean("read"));
-                ticket.setComments(Sets.newHashSet());
-                tickets.add(ticket);
+                ticketIds.add(resultSet.getInt("id"));
             }
             
-            return Optional.of(tickets);
+            return Optional.of(ticketIds);
         }
     }
     
     public static Optional<UserData> getUser(UUID uniqueId) throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
-            storageAdapter.createConnection().prepareStatement("SELECT * FROM `user` WHERE `unique_id` = ? LIMIT 0, 1");
+            storageAdapter.createConnection().prepareStatement("SELECT `name`, `banned` FROM `user` WHERE `unique_id` = ? LIMIT 0, 1");
             storageAdapter.getPreparedStatement().setString(1, uniqueId.toString());
             ResultSet resultSet = storageAdapter.execute();
             if (!resultSet.next()) {
@@ -242,29 +222,24 @@ public class MySQLQuery {
             }
             
             UserData user = new UserData();
-            user.setUniqueId(UUID.fromString(resultSet.getString("unique_id")));
+            user.setUniqueId(uniqueId);
             user.setName(resultSet.getString("name"));
             user.setBanned(resultSet.getBoolean("banned"));
             return Optional.of(user);
         }
     }
     
-    public static Optional<Set<UserData>> getUsers(String name) throws SQLException {
+    public static Optional<Set<UUID>> getUsers(String name) throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
-            storageAdapter.createConnection().prepareStatement("SELECT * FROM `user` WHERE `name` = ? LIMIT 0, 1");
+            storageAdapter.createConnection().prepareStatement("SELECT `unique_id` FROM `user` WHERE `name` = ?");
             storageAdapter.getPreparedStatement().setString(1, name);
             ResultSet resultSet = storageAdapter.execute();
-            
-            Set<UserData> users = Sets.newHashSet();
+            Set<UUID> uniqueIds = Sets.newHashSet();
             while (resultSet.next()) {
-                UserData user = new UserData();
-                user.setUniqueId(UUID.fromString(resultSet.getString("unique_id")));
-                user.setName(resultSet.getString("name"));
-                user.setBanned(resultSet.getBoolean("banned"));
-                users.add(user);
+                uniqueIds.add(UUID.fromString(resultSet.getString("unique_id")));
             }
             
-            return Optional.of(users);
+            return Optional.of(uniqueIds);
         }
     }
     
