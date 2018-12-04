@@ -71,7 +71,7 @@ public class CloseCommand extends AbstractCommand {
         }
         
         if (arguments.isEmpty()) {
-            // Forces the cache expiry.
+            // Forces the expiry to be recalculated
             DataManager.getCachedTicket(ticketId);
             
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Ticket #" + ticket.getId() + " closed").color(ChatColor.GOLD).create());

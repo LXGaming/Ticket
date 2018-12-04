@@ -26,7 +26,10 @@ import nz.co.lolnet.location.api.Location;
 import nz.co.lolnet.ticket.api.data.LocationData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
@@ -53,12 +56,15 @@ public class OpenCommand extends AbstractCommand {
         }
         
         Player player = (Player) source;
-        if (arguments.size() < 3) { // TODO Make configurable.
+        if (arguments.size() < TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getMinimumWords).orElse(0)) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Message is too short", TextColor.RED)));
             return;
         }
         
         String message = String.join(" ", arguments);
+        
+        // Minecraft chat character limit
+        // https://wiki.vg/Protocol#Chat_Message_.28serverbound.29
         if (message.length() > 256) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Message length may not exceed 256", TextColor.RED)));
             return;
@@ -77,12 +83,12 @@ public class OpenCommand extends AbstractCommand {
         
         if (!source.hasPermission("ticket.bypass.limit")) {
             Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
-            if (tickets.size() >= 3) { // TODO Make configurable.
+            if (tickets.size() >= TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getMaximumTickets).orElse(0)) {
                 source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You have too many open tickets", TextColor.RED)));
                 return;
             }
             
-            long time = System.currentTimeMillis() - 30000L; // TODO Make configurable.
+            long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDelay).orElse(0L);
             for (TicketData ticket : tickets) {
                 long duration = ticket.getTimestamp().minusMillis(time).toEpochMilli();
                 if (duration > 0) {

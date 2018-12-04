@@ -17,10 +17,13 @@
 package nz.co.lolnet.ticket.common.configuration;
 
 import nz.co.lolnet.ticket.common.configuration.category.StorageCategory;
+import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 
 public class Config {
     
     private boolean debug = false;
+    private long loginDelay = 2500L;
+    private TicketCategory ticket = new TicketCategory();
     private StorageCategory storage = new StorageCategory();
     
     public boolean isDebug() {
@@ -29,6 +32,14 @@ public class Config {
     
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+    
+    public long getLoginDelay() {
+        return loginDelay;
+    }
+    
+    public TicketCategory getTicket() {
+        return ticket;
     }
     
     public StorageCategory getStorage() {

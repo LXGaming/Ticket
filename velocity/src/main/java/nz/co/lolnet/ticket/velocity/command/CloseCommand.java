@@ -72,7 +72,7 @@ public class CloseCommand extends AbstractCommand {
         }
         
         if (arguments.isEmpty()) {
-            // Forces the cache expiry.
+            // Forces the expiry to be recalculated
             DataManager.getCachedTicket(ticketId);
             
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Ticket closed", TextColor.RED)));
