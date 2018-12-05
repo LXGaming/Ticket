@@ -17,23 +17,27 @@
 package nz.co.lolnet.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
-import net.kyori.text.event.ClickEvent;
 import net.kyori.text.format.TextColor;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
-import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
-import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 public class PardonCommand extends AbstractCommand {
+    
+    public PardonCommand() {
+        addAlias("pardon");
+        addAlias("unban");
+        setPermission("ticket.pardon.base");
+        setUsage("<UniqueId>");
+    }
     
     @Override
     public void execute(Object object, List<String> arguments) {
@@ -44,60 +48,41 @@ public class PardonCommand extends AbstractCommand {
         }
         
         String data = arguments.remove(0);
-        if (data.length() == 36) {
-            UserData user = Toolbox.parseUUID(data).flatMap(DataManager::getUser).orElse(null);
-            if (user == null) {
-                source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("User doesn't exist", TextColor.RED)));
-                return;
-            }
-            
-            if (!user.isBanned()) {
-                source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of(user.getName() + " is not banned", TextColor.RED)));
-                return;
-            }
-            
-            user.setBanned(false);
-            MySQLQuery.updateUser(user);
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of(user.getName() + " pardoned", TextColor.GREEN)));
+        if (data.length() != 36) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Invalid argument length", TextColor.RED)));
             return;
         }
         
-        if (data.length() < 3 || data.length() > 16) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Invalid username length", TextColor.RED)));
+        UUID uniqueId = Toolbox.parseUUID(data).orElse(null);
+        if (uniqueId == null) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse unique id", TextColor.RED)));
             return;
         }
         
-        Player player = VelocityPlugin.getInstance().getProxy().getPlayer(data).orElse(null);
-        if (player != null) {
-            UserData user = DataManager.getCachedUser(player.getUniqueId()).orElse(null);
-            if (user == null) {
-                source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("User doesn't exist", TextColor.RED)));
-                return;
-            }
-            
-            user.setBanned(false);
-            MySQLQuery.updateUser(user);
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of(user.getName() + " pardoned", TextColor.GREEN)));
+        if (VelocityToolbox.getUniqueId(source).equals(uniqueId)) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You cannot pardon yourself", TextColor.RED)));
             return;
         }
         
-        Set<UserData> users = DataManager.getUsers(data).orElse(null);
-        if (users == null || users.isEmpty()) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("User doesn't exist", TextColor.GREEN)));
+        UserData user = DataManager.getUser(uniqueId).orElse(null);
+        if (user == null) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to find user", TextColor.RED)));
             return;
         }
         
-        source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of(" Users", TextColor.GREEN)));
-        for (UserData user : users) {
-            TextComponent.Builder textBuilder = TextComponent.builder("");
-            textBuilder.clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + Reference.ID + " " + getPrimaryAlias().orElse("unknown") + " " + user.getUniqueId()));
-            textBuilder.append(TextComponent.of("> ", TextColor.BLUE));
-            
-            if (user.isBanned()) {
-                textBuilder.append(TextComponent.of(user.getName() + " (" + user.getUniqueId().toString() + ")", TextColor.RED));
-            } else {
-                textBuilder.append(TextComponent.of(user.getName() + " (" + user.getUniqueId().toString() + ")", TextColor.GREEN));
-            }
+        if (!user.isBanned()) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of(user.getName(), TextColor.YELLOW)).append(TextComponent.of(" is not banned", TextColor.GREEN)));
+            return;
+        }
+        
+        user.setBanned(false);
+        if (MySQLQuery.updateUser(user)) {
+            VelocityToolbox.broadcast(null, "ticket.pardon.notify", VelocityToolbox.getTextPrefix()
+                    .append(TextComponent.of(user.getName(), TextColor.YELLOW))
+                    .append(TextComponent.of(" was pardoned by ", TextColor.GREEN))
+                    .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW)));
+        } else {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to update ", TextColor.RED)).append(TextComponent.of(user.getName(), TextColor.YELLOW)));
         }
     }
 }

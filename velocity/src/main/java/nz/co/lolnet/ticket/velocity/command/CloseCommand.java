@@ -17,8 +17,10 @@
 package nz.co.lolnet.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
@@ -26,6 +28,7 @@ import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
+import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 
 import java.time.Instant;
@@ -35,14 +38,13 @@ public class CloseCommand extends AbstractCommand {
     
     public CloseCommand() {
         addAlias("close");
-        setPermission("ticket.command.close");
+        setPermission("ticket.close.base");
         setUsage("<Id> [Message]");
     }
     
     @Override
     public void execute(Object object, List<String> arguments) {
         CommandSource source = (CommandSource) object;
-        
         if (arguments.isEmpty()) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Invalid arguments: " + getUsage(), TextColor.RED)));
             return;
@@ -50,13 +52,18 @@ public class CloseCommand extends AbstractCommand {
         
         Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
         if (ticketId == null) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse argument", TextColor.RED)));
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse ticket id", TextColor.RED)));
             return;
         }
         
-        TicketData ticket = DataManager.getTicket(ticketId).orElse(null);
+        TicketData ticket = DataManager.getCachedTicket(ticketId).orElse(null);
         if (ticket == null) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Ticket doesn't exist", TextColor.RED)));
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Ticket never existed or it's no longer cached", TextColor.RED)));
+            return;
+        }
+        
+        if (!VelocityToolbox.getUniqueId(source).equals(ticket.getUser()) && !source.hasPermission("ticket.close.others")) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You are not the owner of that ticket", TextColor.RED)));
             return;
         }
         
@@ -66,20 +73,29 @@ public class CloseCommand extends AbstractCommand {
         }
         
         ticket.setStatus(1);
+        ticket.setRead(false);
         if (!MySQLQuery.updateTicket(ticket)) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
             return;
         }
         
+        TextComponent textComponent = VelocityToolbox.getTextPrefix()
+                .append(TextComponent.of("Ticket #" + ticket.getId() + " was closed by ", TextColor.GOLD))
+                .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW));
+        
         if (arguments.isEmpty()) {
             // Forces the expiry to be recalculated
             DataManager.getCachedTicket(ticketId);
+            Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
+            if (player != null) {
+                player.sendMessage(textComponent);
+            }
             
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Ticket closed", TextColor.RED)));
+            VelocityToolbox.broadcast(player, "ticket.close.notify", textComponent);
             return;
         }
         
-        String message = String.join(" ", arguments);
+        String message = Toolbox.convertColor(String.join(" ", arguments));
         if (message.length() > 256) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Message length may not exceed 256", TextColor.RED)));
             return;
@@ -91,12 +107,17 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
-        CommentData comment = DataManager.createComment(ticketId, user.getUniqueId(), Instant.now(), message).orElse(null);
+        CommentData comment = DataManager.createComment(ticket.getId(), user.getUniqueId(), Instant.now(), message).orElse(null);
         if (comment == null) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
             return;
         }
         
-        source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You closed a ticket with a reason" + ticket.getId(), TextColor.RED)));
+        Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
+        if (player != null) {
+            player.sendMessage(textComponent);
+        }
+        
+        VelocityToolbox.broadcast(player, "ticket.close.notify", textComponent);
     }
 }

@@ -17,14 +17,17 @@
 package nz.co.lolnet.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
+import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,14 +38,14 @@ public class CommentCommand extends AbstractCommand {
     
     public CommentCommand() {
         addAlias("comment");
-        setPermission("ticket.command.comment");
+        addAlias("comments");
+        setPermission("ticket.comment.base");
         setUsage("<Id> <Message>");
     }
     
     @Override
     public void execute(Object object, List<String> arguments) {
         CommandSource source = (CommandSource) object;
-        
         if (arguments.isEmpty()) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Invalid arguments: " + getUsage(), TextColor.RED)));
             return;
@@ -50,16 +53,18 @@ public class CommentCommand extends AbstractCommand {
         
         Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
         if (ticketId == null) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse argument", TextColor.RED)));
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse ticket id", TextColor.RED)));
             return;
         }
         
-        String message = String.join(" ", arguments);
+        String message = Toolbox.convertColor(String.join(" ", arguments));
         if (StringUtils.isBlank(message)) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Message cannot be blank", TextColor.RED)));
             return;
         }
         
+        // Minecraft chat character limit
+        // https://wiki.vg/Protocol#Chat_Message_.28serverbound.29
         if (message.length() > 256) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Message length may not exceed 256", TextColor.RED)));
             return;
@@ -83,6 +88,15 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
-        source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You added a comment to ticket #" + ticket.getId(), TextColor.GOLD)));
+        TextComponent textComponent = VelocityToolbox.getTextPrefix()
+                .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW))
+                .append(TextComponent.of(" added a comment to Ticket #" + ticket.getId(), TextColor.GOLD));
+        
+        Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
+        if (player != null) {
+            player.sendMessage(textComponent);
+        }
+        
+        VelocityToolbox.broadcast(player, "ticket.open.notify", textComponent);
     }
 }

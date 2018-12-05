@@ -26,6 +26,8 @@ import net.kyori.text.format.TextColor;
 import net.kyori.text.format.TextDecoration;
 import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.util.Reference;
+import nz.co.lolnet.ticket.velocity.VelocityPlugin;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -53,6 +55,15 @@ public class VelocityToolbox {
         textBuilder.clickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         textBuilder.content(url).color(TextColor.BLUE);
         return textBuilder.build();
+    }
+    
+    public static void broadcast(CommandSource source, String permission, TextComponent message) {
+        VelocityPlugin.getInstance().getProxy().getConsoleCommandSource().sendMessage(message);
+        for (Player player : VelocityPlugin.getInstance().getProxy().getAllPlayers()) {
+            if (player != source && (StringUtils.isBlank(permission) || player.hasPermission(permission))) {
+                player.sendMessage(message);
+            }
+        }
     }
     
     public static UUID getUniqueId(CommandSource source) {

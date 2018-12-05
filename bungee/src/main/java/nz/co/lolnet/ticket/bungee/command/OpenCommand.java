@@ -20,6 +20,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import nz.co.lolnet.location.api.Location;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.LocationData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
@@ -40,14 +41,13 @@ public class OpenCommand extends AbstractCommand {
     
     public OpenCommand() {
         addAlias("open");
-        setPermission("ticket.command.open");
+        setPermission("ticket.open.base");
         setUsage("<Message>");
     }
     
     @Override
     public void execute(Object object, List<String> arguments) {
         CommandSender sender = (CommandSender) object;
-        
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("This command can only be executed by players.").color(ChatColor.RED).create());
             return;
@@ -79,13 +79,15 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
-        if (!sender.hasPermission("ticket.bypass.limit")) {
-            Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
+        Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
+        if (!sender.hasPermission("ticket.open.exempt.max")) {
             if (tickets.size() >= TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getMaximumTickets).orElse(0)) {
                 sender.sendMessage(BungeeToolbox.getTextPrefix().append("You have too many open tickets").color(ChatColor.RED).create());
                 return;
             }
-            
+        }
+        
+        if (!sender.hasPermission("ticket.open.exempt.cooldown")) {
             long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDelay).orElse(0L);
             for (TicketData ticket : tickets) {
                 long duration = ticket.getTimestamp().minusMillis(time).toEpochMilli();
@@ -116,5 +118,9 @@ public class OpenCommand extends AbstractCommand {
         }
         
         sender.sendMessage(BungeeToolbox.getTextPrefix().append("You opened a ticket, it has been assigned ID #" + ticket.getId()).color(ChatColor.GOLD).create());
+        BungeeToolbox.broadcast(sender, "ticket.open.notify", BungeeToolbox.getTextPrefix()
+                .append("A new ticket has been opened by ").color(ChatColor.GREEN)
+                .append(Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown")).color(ChatColor.YELLOW)
+                .append(", id assigned #" + ticket.getId()).color(ChatColor.GREEN).create());
     }
 }

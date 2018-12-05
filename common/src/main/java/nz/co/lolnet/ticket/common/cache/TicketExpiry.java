@@ -30,6 +30,11 @@ public class TicketExpiry implements Expiry<Integer, TicketData> {
             return Long.MAX_VALUE;
         }
         
+        if (value.getStatus() == 1 && !value.isRead() && Ticket.getInstance().getPlatform().isOnline(value.getUser())) {
+            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
+            return Long.MAX_VALUE;
+        }
+        
         return Duration.ofHours(1L).toNanos();
     }
     
@@ -39,12 +44,22 @@ public class TicketExpiry implements Expiry<Integer, TicketData> {
             return Long.MAX_VALUE;
         }
         
+        if (value.getStatus() == 1 && !value.isRead() && Ticket.getInstance().getPlatform().isOnline(value.getUser())) {
+            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
+            return Long.MAX_VALUE;
+        }
+        
         return Duration.ofHours(1L).toNanos();
     }
     
     @Override
     public long expireAfterRead(Integer key, TicketData value, long currentTime, long currentDuration) {
         if (value.getStatus() == 0) {
+            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
+            return Long.MAX_VALUE;
+        }
+        
+        if (value.getStatus() == 1 && !value.isRead() && Ticket.getInstance().getPlatform().isOnline(value.getUser())) {
             Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
             return Long.MAX_VALUE;
         }

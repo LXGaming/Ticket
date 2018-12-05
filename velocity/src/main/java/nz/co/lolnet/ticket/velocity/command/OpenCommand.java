@@ -23,6 +23,7 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.location.api.Location;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.LocationData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
@@ -31,6 +32,7 @@ import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
+import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 
@@ -42,14 +44,13 @@ public class OpenCommand extends AbstractCommand {
     
     public OpenCommand() {
         addAlias("open");
-        setPermission("ticket.command.open");
+        setPermission("ticket.open.base");
         setUsage("<Message>");
     }
     
     @Override
     public void execute(Object object, List<String> arguments) {
         CommandSource source = (CommandSource) object;
-        
         if (!(source instanceof Player)) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("This command can only be executed by players.", TextColor.RED)));
             return;
@@ -61,7 +62,7 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
-        String message = String.join(" ", arguments);
+        String message = Toolbox.convertColor(String.join(" ", arguments));
         
         // Minecraft chat character limit
         // https://wiki.vg/Protocol#Chat_Message_.28serverbound.29
@@ -81,13 +82,15 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
-        if (!source.hasPermission("ticket.bypass.limit")) {
-            Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
+        Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
+        if (!source.hasPermission("ticket.open.exempt.max")) {
             if (tickets.size() >= TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getMaximumTickets).orElse(0)) {
                 source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You have too many open tickets", TextColor.RED)));
                 return;
             }
-            
+        }
+        
+        if (!source.hasPermission("ticket.open.exempt.cooldown")) {
             long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDelay).orElse(0L);
             for (TicketData ticket : tickets) {
                 long duration = ticket.getTimestamp().minusMillis(time).toEpochMilli();
@@ -117,6 +120,10 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
-        source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You opened a ticket, it has been assigned ID #" + ticket.getId(), TextColor.YELLOW)));
+        source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You opened a ticket, it has been assigned ID #" + ticket.getId(), TextColor.GOLD)));
+        VelocityToolbox.broadcast(source, "ticket.open.notify", VelocityToolbox.getTextPrefix()
+                .append(TextComponent.of("A new ticket has been opened by ", TextColor.GREEN))
+                .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW))
+                .append(TextComponent.of(", id assigned #" + ticket.getId(), TextColor.GREEN)));
     }
 }

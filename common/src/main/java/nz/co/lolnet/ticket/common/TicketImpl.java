@@ -18,7 +18,6 @@ package nz.co.lolnet.ticket.common;
 
 import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.Ticket;
-import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
@@ -27,7 +26,6 @@ import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.LoggerImpl;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class TicketImpl extends Ticket {
     
@@ -65,11 +63,10 @@ public class TicketImpl extends Ticket {
         
         DataManager.getTicketCache().invalidateAll();
         DataManager.getUserCache().invalidateAll();
-        Set<TicketData> tickets = DataManager.getOpenTickets().orElse(null);
-        if (tickets != null && !tickets.isEmpty()) {
+        DataManager.getOpenTickets().ifPresent(tickets -> {
             tickets.forEach(ticket -> DataManager.getUser(ticket.getUser()));
             getLogger().info("Loaded {} open tickets", tickets.size());
-        }
+        });
         
         return true;
     }

@@ -35,6 +35,7 @@ public class HelpCommand extends AbstractCommand {
     public HelpCommand() {
         addAlias("help");
         addAlias("?");
+        setPermission("ticket.help.base");
     }
     
     @Override

@@ -18,9 +18,13 @@ package nz.co.lolnet.ticket.bungee.command;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.DataManager;
@@ -35,14 +39,13 @@ public class CommentCommand extends AbstractCommand {
     public CommentCommand() {
         addAlias("comment");
         addAlias("comments");
-        setPermission("ticket.command.comment");
-        setUsage("<Id> [Message]");
+        setPermission("ticket.comment.base");
+        setUsage("<Id> <Message>");
     }
     
     @Override
     public void execute(Object object, List<String> arguments) {
         CommandSender sender = (CommandSender) object;
-        
         if (arguments.isEmpty()) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Invalid arguments: " + getUsage()).color(ChatColor.RED).create());
             return;
@@ -50,16 +53,18 @@ public class CommentCommand extends AbstractCommand {
         
         Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
         if (ticketId == null) {
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to parse argument").color(ChatColor.RED).create());
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to parse ticket id").color(ChatColor.RED).create());
             return;
         }
         
-        String message = String.join(" ", arguments);
+        String message = Toolbox.convertColor(String.join(" ", arguments));
         if (StringUtils.isBlank(message)) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Message cannot be blank").color(ChatColor.RED).create());
             return;
         }
         
+        // Minecraft chat character limit
+        // https://wiki.vg/Protocol#Chat_Message_.28serverbound.29
         if (message.length() > 256) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Message length may not exceed 256").color(ChatColor.RED).create());
             return;
@@ -83,6 +88,15 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
-        sender.sendMessage(BungeeToolbox.getTextPrefix().append("You added a comment to ticket #" + ticket.getId()).color(ChatColor.GOLD).create());
+        BaseComponent[] baseComponents = BungeeToolbox.getTextPrefix()
+                .append(Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown")).color(ChatColor.YELLOW)
+                .append(" added a comment to Ticket #" + ticket.getId()).color(ChatColor.GOLD).create();
+        
+        ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(ticket.getUser());
+        if (player != null) {
+            player.sendMessage(baseComponents);
+        }
+        
+        BungeeToolbox.broadcast(player, "ticket.open.notify", baseComponents);
     }
 }

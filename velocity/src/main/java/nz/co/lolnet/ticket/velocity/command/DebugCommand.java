@@ -32,7 +32,7 @@ public class DebugCommand extends AbstractCommand {
     
     public DebugCommand() {
         addAlias("debug");
-        setPermission("ticket.command.debug");
+        setPermission("ticket.debug.base");
     }
     
     @Override

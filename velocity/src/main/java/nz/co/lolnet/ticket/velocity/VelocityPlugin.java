@@ -33,15 +33,16 @@ import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.manager.CommandManager;
 import nz.co.lolnet.ticket.velocity.command.BanCommand;
-import nz.co.lolnet.ticket.velocity.command.CheckCommand;
 import nz.co.lolnet.ticket.velocity.command.CloseCommand;
 import nz.co.lolnet.ticket.velocity.command.CommentCommand;
 import nz.co.lolnet.ticket.velocity.command.DebugCommand;
 import nz.co.lolnet.ticket.velocity.command.HelpCommand;
 import nz.co.lolnet.ticket.velocity.command.OpenCommand;
 import nz.co.lolnet.ticket.velocity.command.PardonCommand;
+import nz.co.lolnet.ticket.velocity.command.ReadCommand;
 import nz.co.lolnet.ticket.velocity.command.ReloadCommand;
 import nz.co.lolnet.ticket.velocity.command.TicketCommand;
+import nz.co.lolnet.ticket.velocity.command.UserCommand;
 import nz.co.lolnet.ticket.velocity.listener.RedisListener;
 import nz.co.lolnet.ticket.velocity.listener.VelocityListener;
 import org.slf4j.LoggerFactory;
@@ -86,16 +87,16 @@ public class VelocityPlugin implements Platform {
         ticket.loadTicket();
         
         CommandManager.registerCommand(BanCommand.class);
-        CommandManager.registerCommand(CheckCommand.class);
         CommandManager.registerCommand(CloseCommand.class);
         CommandManager.registerCommand(CommentCommand.class);
         CommandManager.registerCommand(DebugCommand.class);
         CommandManager.registerCommand(HelpCommand.class);
         CommandManager.registerCommand(OpenCommand.class);
         CommandManager.registerCommand(PardonCommand.class);
+        CommandManager.registerCommand(ReadCommand.class);
         CommandManager.registerCommand(ReloadCommand.class);
+        CommandManager.registerCommand(UserCommand.class);
         getProxy().getCommandManager().register(new TicketCommand(), "ticket");
-        
         getProxy().getEventManager().register(getInstance(), new VelocityListener());
         
         if (getProxy().getPluginManager().isLoaded("redisvelocity")) {

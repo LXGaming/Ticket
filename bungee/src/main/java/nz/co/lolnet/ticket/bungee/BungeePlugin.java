@@ -25,15 +25,16 @@ import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.util.Logger;
 import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.command.BanCommand;
-import nz.co.lolnet.ticket.bungee.command.CheckCommand;
 import nz.co.lolnet.ticket.bungee.command.CloseCommand;
 import nz.co.lolnet.ticket.bungee.command.CommentCommand;
 import nz.co.lolnet.ticket.bungee.command.DebugCommand;
 import nz.co.lolnet.ticket.bungee.command.HelpCommand;
 import nz.co.lolnet.ticket.bungee.command.OpenCommand;
 import nz.co.lolnet.ticket.bungee.command.PardonCommand;
+import nz.co.lolnet.ticket.bungee.command.ReadCommand;
 import nz.co.lolnet.ticket.bungee.command.ReloadCommand;
 import nz.co.lolnet.ticket.bungee.command.TicketCommand;
+import nz.co.lolnet.ticket.bungee.command.UserCommand;
 import nz.co.lolnet.ticket.bungee.listener.BungeeListener;
 import nz.co.lolnet.ticket.bungee.listener.RedisListener;
 import nz.co.lolnet.ticket.common.TicketImpl;
@@ -65,14 +66,15 @@ public class BungeePlugin extends Plugin implements Platform {
         ticket.loadTicket();
         
         CommandManager.registerCommand(BanCommand.class);
-        CommandManager.registerCommand(CheckCommand.class);
         CommandManager.registerCommand(CloseCommand.class);
         CommandManager.registerCommand(CommentCommand.class);
         CommandManager.registerCommand(DebugCommand.class);
         CommandManager.registerCommand(HelpCommand.class);
         CommandManager.registerCommand(OpenCommand.class);
         CommandManager.registerCommand(PardonCommand.class);
+        CommandManager.registerCommand(ReadCommand.class);
         CommandManager.registerCommand(ReloadCommand.class);
+        CommandManager.registerCommand(UserCommand.class);
         getProxy().getPluginManager().registerCommand(getInstance(), new TicketCommand());
         getProxy().getPluginManager().registerListener(getInstance(), new BungeeListener());
         

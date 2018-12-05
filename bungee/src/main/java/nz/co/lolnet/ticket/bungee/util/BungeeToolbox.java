@@ -18,12 +18,15 @@ package nz.co.lolnet.ticket.bungee.util;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.util.Reference;
+import nz.co.lolnet.ticket.bungee.BungeePlugin;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -53,6 +56,15 @@ public class BungeeToolbox {
         componentBuilder.append(url).color(ChatColor.BLUE);
         componentBuilder.append(" ", ComponentBuilder.FormatRetention.NONE);
         return componentBuilder;
+    }
+    
+    public static void broadcast(CommandSender sender, String permission, BaseComponent[] message) {
+        BungeePlugin.getInstance().getProxy().getConsole().sendMessage(message);
+        for (ProxiedPlayer player : BungeePlugin.getInstance().getProxy().getPlayers()) {
+            if (player != sender && (StringUtils.isBlank(permission) || player.hasPermission(permission))) {
+                player.sendMessage(message);
+            }
+        }
     }
     
     public static UUID getUniqueId(CommandSender sender) {

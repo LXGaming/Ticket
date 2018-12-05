@@ -35,13 +35,13 @@ public class HelpCommand extends AbstractCommand {
     public HelpCommand() {
         addAlias("help");
         addAlias("?");
+        setPermission("ticket.help.base");
     }
     
     @Override
     public void execute(Object object, List<String> arguments) {
         CommandSender sender = (CommandSender) object;
-        
-        sender.sendMessage(BungeeToolbox.getTextPrefix().append(" Help").color(ChatColor.GREEN).create());
+        sender.sendMessage(BungeeToolbox.getTextPrefix().append("Help").color(ChatColor.GREEN).create());
         for (AbstractCommand command : CommandManager.getCommands()) {
             if (command == this || !(StringUtils.isNotBlank(command.getPermission()) && sender.hasPermission(command.getPermission()))) {
                 continue;

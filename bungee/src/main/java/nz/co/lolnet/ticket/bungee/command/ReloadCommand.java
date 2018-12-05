@@ -28,7 +28,7 @@ public class ReloadCommand extends AbstractCommand {
     
     public ReloadCommand() {
         addAlias("reload");
-        setPermission("ticket.command.reload");
+        setPermission("ticket.reload.base");
     }
     
     @Override

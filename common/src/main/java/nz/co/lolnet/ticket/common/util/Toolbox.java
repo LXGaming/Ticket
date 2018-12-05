@@ -94,6 +94,18 @@ public class Toolbox {
         }
     }
     
+    public static String formatUnit(long unit, String singular, String plural) {
+        if (unit > 0) {
+            if (unit == 1) {
+                return singular;
+            }
+            
+            return plural;
+        } else {
+            return null;
+        }
+    }
+    
     public static double formatDecimal(double value, int places) {
         BigDecimal bigDecimal = new BigDecimal(value);
         bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);

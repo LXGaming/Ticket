@@ -107,6 +107,17 @@ public class DataManager {
         return tickets;
     }
     
+    public static Set<TicketData> getCachedUnreadTickets(UUID uniqueId) {
+        Set<TicketData> tickets = Sets.newHashSet();
+        for (TicketData ticket : getTicketCache().asMap().values()) {
+            if (ticket.getUser().equals(uniqueId) && ticket.getStatus() == 1 && !ticket.isRead()) {
+                tickets.add(ticket);
+            }
+        }
+        
+        return tickets;
+    }
+    
     public static Optional<TicketData> getCachedTicket(int ticketId) {
         return Optional.ofNullable(getTicketCache().getIfPresent(ticketId));
     }

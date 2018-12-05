@@ -18,12 +18,8 @@ package nz.co.lolnet.ticket.bungee.command;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
-import nz.co.lolnet.ticket.api.util.Reference;
-import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.DataManager;
@@ -31,15 +27,15 @@ import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 public class PardonCommand extends AbstractCommand {
     
     public PardonCommand() {
         addAlias("pardon");
         addAlias("unban");
-        setPermission("ticket.command.pardon");
-        setUsage("<Player>");
+        setPermission("ticket.pardon.base");
+        setUsage("<UniqueId>");
     }
     
     @Override
@@ -51,61 +47,41 @@ public class PardonCommand extends AbstractCommand {
         }
         
         String data = arguments.remove(0);
-        if (data.length() == 36) {
-            UserData user = Toolbox.parseUUID(data).flatMap(DataManager::getUser).orElse(null);
-            if (user == null) {
-                sender.sendMessage(BungeeToolbox.getTextPrefix().append("User doesn't exist").color(ChatColor.RED).create());
-                return;
-            }
-            
-            if (!user.isBanned()) {
-                sender.sendMessage(BungeeToolbox.getTextPrefix().append(user.getName() + " is not banned").color(ChatColor.RED).create());
-                return;
-            }
-            
-            user.setBanned(false);
-            MySQLQuery.updateUser(user);
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append(user.getName() + " pardoned").color(ChatColor.GREEN).create());
+        if (data.length() != 36) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Invalid argument length").color(ChatColor.RED).create());
             return;
         }
         
-        if (data.length() < 3 || data.length() > 16) {
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Invalid username length").color(ChatColor.RED).create());
+        UUID uniqueId = Toolbox.parseUUID(data).orElse(null);
+        if (uniqueId == null) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to parse unique id").color(ChatColor.RED).create());
             return;
         }
         
-        ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(data);
-        if (player != null) {
-            UserData user = DataManager.getCachedUser(player.getUniqueId()).orElse(null);
-            if (user == null) {
-                sender.sendMessage(BungeeToolbox.getTextPrefix().append("User doesn't exist").color(ChatColor.RED).create());
-                return;
-            }
-            
-            user.setBanned(false);
-            MySQLQuery.updateUser(user);
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append(user.getName() + " pardoned").color(ChatColor.GREEN).create());
+        if (BungeeToolbox.getUniqueId(sender).equals(uniqueId)) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("You cannot pardon yourself").color(ChatColor.RED).create());
             return;
         }
         
-        Set<UserData> users = DataManager.getUsers(data).orElse(null);
-        if (users == null || users.isEmpty()) {
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append("User doesn't exist").color(ChatColor.GREEN).create());
+        UserData user = DataManager.getUser(uniqueId).orElse(null);
+        if (user == null) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to find user").color(ChatColor.RED).create());
             return;
         }
         
-        sender.sendMessage(BungeeToolbox.getTextPrefix().append(" Users").color(ChatColor.GREEN).create());
-        for (UserData user : users) {
-            ComponentBuilder componentBuilder = new ComponentBuilder("");
-            componentBuilder.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + Reference.ID + " " + getPrimaryAlias().orElse("unknown") + " " + user.getUniqueId()));
-            componentBuilder.append("> ").color(ChatColor.BLUE);
-            
-            componentBuilder.append(user.getName()).append(" (").append(user.getUniqueId().toString()).append(")");
-            if (user.isBanned()) {
-                componentBuilder.color(ChatColor.RED);
-            } else {
-                componentBuilder.color(ChatColor.GREEN);
-            }
+        if (!user.isBanned()) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append(user.getName()).color(ChatColor.YELLOW).append(" is not banned").color(ChatColor.GREEN).create());
+            return;
+        }
+        
+        user.setBanned(false);
+        if (MySQLQuery.updateUser(user)) {
+            BungeeToolbox.broadcast(null, "ticket.pardon.notify", BungeeToolbox.getTextPrefix()
+                    .append(user.getName()).color(ChatColor.YELLOW)
+                    .append(" was pardoned by ").color(ChatColor.GREEN)
+                    .append(Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown")).color(ChatColor.YELLOW).create());
+        } else {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to update ").color(ChatColor.RED).append(user.getName()).color(ChatColor.YELLOW).create());
         }
     }
 }
