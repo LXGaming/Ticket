@@ -20,7 +20,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import nz.co.lolnet.location.api.Location;
-import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.LocationData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
@@ -29,6 +28,7 @@ import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -117,10 +117,15 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
+        BungeeToolbox.sendRedisMessage("TicketOpen", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
+        
         sender.sendMessage(BungeeToolbox.getTextPrefix().append("You opened a ticket, it has been assigned ID #" + ticket.getId()).color(ChatColor.GOLD).create());
         BungeeToolbox.broadcast(sender, "ticket.open.notify", BungeeToolbox.getTextPrefix()
                 .append("A new ticket has been opened by ").color(ChatColor.GREEN)
-                .append(Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown")).color(ChatColor.YELLOW)
+                .append(user.getName()).color(ChatColor.YELLOW)
                 .append(", id assigned #" + ticket.getId()).color(ChatColor.GREEN).create());
     }
 }

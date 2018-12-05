@@ -23,13 +23,13 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.location.api.Location;
-import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.LocationData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -120,10 +120,15 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
+        VelocityToolbox.sendRedisMessage("TicketOpen", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
+        
         source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You opened a ticket, it has been assigned ID #" + ticket.getId(), TextColor.GOLD)));
         VelocityToolbox.broadcast(source, "ticket.open.notify", VelocityToolbox.getTextPrefix()
                 .append(TextComponent.of("A new ticket has been opened by ", TextColor.GREEN))
-                .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW))
+                .append(TextComponent.of(user.getName(), TextColor.YELLOW))
                 .append(TextComponent.of(", id assigned #" + ticket.getId(), TextColor.GREEN)));
     }
 }

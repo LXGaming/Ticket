@@ -20,13 +20,13 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
@@ -88,8 +88,13 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
+        BungeeToolbox.sendRedisMessage("TicketComment", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
+        
         BaseComponent[] baseComponents = BungeeToolbox.getTextPrefix()
-                .append(Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown")).color(ChatColor.YELLOW)
+                .append(user.getName()).color(ChatColor.YELLOW)
                 .append(" added a comment to Ticket #" + ticket.getId()).color(ChatColor.GOLD).create();
         
         ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(ticket.getUser());
@@ -97,6 +102,6 @@ public class CommentCommand extends AbstractCommand {
             player.sendMessage(baseComponents);
         }
         
-        BungeeToolbox.broadcast(player, "ticket.open.notify", baseComponents);
+        BungeeToolbox.broadcast(player, "ticket.comment.notify", baseComponents);
     }
 }

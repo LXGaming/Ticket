@@ -78,7 +78,8 @@ public class BungeePlugin extends Plugin implements Platform {
         getProxy().getPluginManager().registerCommand(getInstance(), new TicketCommand());
         getProxy().getPluginManager().registerListener(getInstance(), new BungeeListener());
         
-        if (getProxy().getPluginManager().getPlugin("RedisVelocity") != null) {
+        if (getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
+            Ticket.getInstance().getLogger().info("RedisBungee detected");
             getProxy().getPluginManager().registerListener(getInstance(), new RedisListener());
             RedisBungee.getApi().registerPubSubChannels(Reference.ID);
         }
@@ -105,13 +106,6 @@ public class BungeePlugin extends Plugin implements Platform {
         }
         
         return Optional.ofNullable(ProxyServer.getInstance().getPlayer(uniqueId)).map(ProxiedPlayer::getName);
-    }
-    
-    @Override
-    public void sendRedisMessage(String message) {
-        if (getProxy().getPluginManager().getPlugin("redisbungee") != null) {
-            RedisBungee.getApi().sendChannelMessage(Reference.ID, message);
-        }
     }
     
     @Override

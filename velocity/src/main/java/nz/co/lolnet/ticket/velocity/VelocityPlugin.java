@@ -105,6 +105,7 @@ public class VelocityPlugin implements Platform {
         getProxy().getEventManager().register(getInstance(), new VelocityListener());
         
         if (getProxy().getPluginManager().isLoaded("redisvelocity")) {
+            Ticket.getInstance().getLogger().info("RedisVelocity detected");
             getProxy().getEventManager().register(getInstance(), new RedisListener());
             RedisVelocity.getInstance().registerChannels(Reference.ID);
         }
@@ -131,13 +132,6 @@ public class VelocityPlugin implements Platform {
         }
         
         return getProxy().getPlayer(uniqueId).map(Player::getUsername);
-    }
-    
-    @Override
-    public void sendRedisMessage(String message) {
-        if (getProxy().getPluginManager().getPlugin("redisvelocity").isPresent()) {
-            RedisVelocity.getInstance().sendMessage(Reference.ID, message);
-        }
     }
     
     @Override

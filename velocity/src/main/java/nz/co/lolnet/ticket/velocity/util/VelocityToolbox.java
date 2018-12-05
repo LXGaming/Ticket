@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.ticket.velocity.util;
 
+import com.google.gson.JsonObject;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.Components;
@@ -24,12 +25,17 @@ import net.kyori.text.event.ClickEvent;
 import net.kyori.text.event.HoverEvent;
 import net.kyori.text.format.TextColor;
 import net.kyori.text.format.TextDecoration;
+import nz.co.lolnet.redisvelocity.api.RedisVelocity;
 import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.util.Reference;
+import nz.co.lolnet.ticket.common.TicketImpl;
+import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class VelocityToolbox {
     
@@ -55,6 +61,16 @@ public class VelocityToolbox {
         textBuilder.clickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         textBuilder.content(url).color(TextColor.BLUE);
         return textBuilder.build();
+    }
+    
+    public static void sendRedisMessage(String type, Consumer<JsonObject> consumer) {
+        if (VelocityPlugin.getInstance().getProxy().getPluginManager().getPlugin("redisvelocity").isPresent()) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("id", TicketImpl.getInstance().getConfig().map(Config::getProxyId).orElse(null));
+            jsonObject.addProperty("type", type);
+            consumer.accept(jsonObject);
+            RedisVelocity.getInstance().sendMessage(Reference.ID, Configuration.getGson().toJson(jsonObject));
+        }
     }
     
     public static void broadcast(CommandSource source, String permission, TextComponent message) {

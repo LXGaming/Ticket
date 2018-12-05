@@ -20,11 +20,11 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
-import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -79,9 +79,20 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
+        UserData user = DataManager.getOrCreateUser(VelocityToolbox.getUniqueId(source)).orElse(null);
+        if (user == null) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
+            return;
+        }
+        
+        VelocityToolbox.sendRedisMessage("TicketClose", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
+        
         TextComponent textComponent = VelocityToolbox.getTextPrefix()
                 .append(TextComponent.of("Ticket #" + ticket.getId() + " was closed by ", TextColor.GOLD))
-                .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW));
+                .append(TextComponent.of(user.getName(), TextColor.YELLOW));
         
         if (arguments.isEmpty()) {
             // Forces the expiry to be recalculated
@@ -101,17 +112,16 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
-        UserData user = DataManager.getOrCreateUser(VelocityToolbox.getUniqueId(source)).orElse(null);
-        if (user == null) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
-            return;
-        }
-        
         CommentData comment = DataManager.createComment(ticket.getId(), user.getUniqueId(), Instant.now(), message).orElse(null);
         if (comment == null) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
             return;
         }
+        
+        VelocityToolbox.sendRedisMessage("TicketComment", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
         
         Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
         if (player != null) {

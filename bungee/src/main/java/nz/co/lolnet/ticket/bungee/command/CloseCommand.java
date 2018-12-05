@@ -20,13 +20,13 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -79,9 +79,20 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
+        UserData user = DataManager.getOrCreateUser(BungeeToolbox.getUniqueId(sender)).orElse(null);
+        if (user == null) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("An error has occurred. Details are available in console.").color(ChatColor.RED).create());
+            return;
+        }
+        
+        BungeeToolbox.sendRedisMessage("TicketClose", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
+        
         BaseComponent[] baseComponents = BungeeToolbox.getTextPrefix()
                 .append("Ticket #" + ticket.getId() + " was closed by ").color(ChatColor.GOLD)
-                .append(Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown")).color(ChatColor.YELLOW).create();
+                .append(user.getName()).color(ChatColor.YELLOW).create();
         
         if (arguments.isEmpty()) {
             // Forces the expiry to be recalculated
@@ -101,17 +112,16 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
-        UserData user = DataManager.getOrCreateUser(BungeeToolbox.getUniqueId(sender)).orElse(null);
-        if (user == null) {
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append("An error has occurred. Details are available in console.").color(ChatColor.RED).create());
-            return;
-        }
-        
         CommentData comment = DataManager.createComment(ticket.getId(), user.getUniqueId(), Instant.now(), message).orElse(null);
         if (comment == null) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("An error has occurred. Details are available in console.").color(ChatColor.RED).create());
             return;
         }
+        
+        BungeeToolbox.sendRedisMessage("TicketComment", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
         
         ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(ticket.getUser());
         if (player != null) {

@@ -16,12 +16,14 @@
 
 package nz.co.lolnet.ticket.velocity.command;
 
+import com.google.gson.JsonObject;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -76,6 +78,11 @@ public class BanCommand extends AbstractCommand {
         
         user.setBanned(true);
         if (MySQLQuery.updateUser(user)) {
+            VelocityToolbox.sendRedisMessage("UserBan", (JsonObject jsonObject) -> {
+                jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+                jsonObject.addProperty("by", Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"));
+            });
+            
             VelocityToolbox.broadcast(null, "ticket.ban.notify", VelocityToolbox.getTextPrefix()
                     .append(TextComponent.of(user.getName(), TextColor.YELLOW))
                     .append(TextComponent.of(" was banned by ", TextColor.GREEN))

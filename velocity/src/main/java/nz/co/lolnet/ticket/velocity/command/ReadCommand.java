@@ -127,6 +127,19 @@ public class ReadCommand extends AbstractCommand {
         }
         
         textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.of("User", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
+        UserData user = DataManager.getUser(ticket.getUser()).orElse(null);
+        if (user != null) {
+            if (Ticket.getInstance().getPlatform().isOnline(user.getUniqueId())) {
+                textBuilder.append(TextComponent.of(user.getName(), TextColor.GREEN));
+            } else {
+                textBuilder.append(TextComponent.of(user.getName(), TextColor.RED));
+            }
+        } else {
+            textBuilder.append(TextComponent.of("Unknown", TextColor.WHITE));
+        }
+        
+        textBuilder.append(Components.newline());
         textBuilder.append(TextComponent.of("Location", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         
         if (ticket.getLocation().getX() != null && ticket.getLocation().getY() != null && ticket.getLocation().getZ() != null) {

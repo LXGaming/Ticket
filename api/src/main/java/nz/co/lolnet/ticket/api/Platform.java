@@ -28,7 +28,5 @@ public interface Platform {
     
     Optional<String> getUsername(UUID uniqueId);
     
-    void sendRedisMessage(String message);
-    
     Path getPath();
 }

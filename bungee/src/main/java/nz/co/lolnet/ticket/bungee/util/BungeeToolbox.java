@@ -16,6 +16,8 @@
 
 package nz.co.lolnet.ticket.bungee.util;
 
+import com.google.gson.JsonObject;
+import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -26,9 +28,13 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
+import nz.co.lolnet.ticket.common.TicketImpl;
+import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class BungeeToolbox {
     
@@ -56,6 +62,16 @@ public class BungeeToolbox {
         componentBuilder.append(url).color(ChatColor.BLUE);
         componentBuilder.append(" ", ComponentBuilder.FormatRetention.NONE);
         return componentBuilder;
+    }
+    
+    public static void sendRedisMessage(String type, Consumer<JsonObject> consumer) {
+        if (BungeePlugin.getInstance().getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("id", TicketImpl.getInstance().getConfig().map(Config::getProxyId).orElse(null));
+            jsonObject.addProperty("type", type);
+            consumer.accept(jsonObject);
+            RedisBungee.getApi().sendChannelMessage(Reference.ID, Configuration.getGson().toJson(jsonObject));
+        }
     }
     
     public static void broadcast(CommandSender sender, String permission, BaseComponent[] message) {

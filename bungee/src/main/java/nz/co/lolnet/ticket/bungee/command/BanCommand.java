@@ -22,6 +22,7 @@ import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -75,6 +76,11 @@ public class BanCommand extends AbstractCommand {
         
         user.setBanned(true);
         if (MySQLQuery.updateUser(user)) {
+            BungeeToolbox.sendRedisMessage("UserBan", jsonObject -> {
+                jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+                jsonObject.addProperty("by", Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown"));
+            });
+            
             BungeeToolbox.broadcast(null, "ticket.ban.notify", BungeeToolbox.getTextPrefix()
                     .append(user.getName()).color(ChatColor.YELLOW)
                     .append(" was banned by ").color(ChatColor.GREEN)

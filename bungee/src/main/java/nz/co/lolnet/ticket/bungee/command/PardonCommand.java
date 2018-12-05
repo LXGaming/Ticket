@@ -22,6 +22,7 @@ import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -76,6 +77,11 @@ public class PardonCommand extends AbstractCommand {
         
         user.setBanned(false);
         if (MySQLQuery.updateUser(user)) {
+            BungeeToolbox.sendRedisMessage("UserPardon", jsonObject -> {
+                jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+                jsonObject.addProperty("by", Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown"));
+            });
+            
             BungeeToolbox.broadcast(null, "ticket.pardon.notify", BungeeToolbox.getTextPrefix()
                     .append(user.getName()).color(ChatColor.YELLOW)
                     .append(" was pardoned by ").color(ChatColor.GREEN)

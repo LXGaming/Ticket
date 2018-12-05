@@ -20,11 +20,11 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
-import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
@@ -88,8 +88,13 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
+        VelocityToolbox.sendRedisMessage("TicketComment", jsonObject -> {
+            jsonObject.add("ticket", Configuration.getGson().toJsonTree(ticket));
+            jsonObject.add("user", Configuration.getGson().toJsonTree(user));
+        });
+        
         TextComponent textComponent = VelocityToolbox.getTextPrefix()
-                .append(TextComponent.of(Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"), TextColor.YELLOW))
+                .append(TextComponent.of(user.getName(), TextColor.YELLOW))
                 .append(TextComponent.of(" added a comment to Ticket #" + ticket.getId(), TextColor.GOLD));
         
         Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
@@ -97,6 +102,6 @@ public class CommentCommand extends AbstractCommand {
             player.sendMessage(textComponent);
         }
         
-        VelocityToolbox.broadcast(player, "ticket.open.notify", textComponent);
+        VelocityToolbox.broadcast(player, "ticket.comment.notify", textComponent);
     }
 }
