@@ -89,7 +89,7 @@ public class DataManager {
         Set<TicketData> tickets = Sets.newHashSet();
         for (TicketData ticket : getTicketCache().asMap().values()) {
             if (ticket.getUser().equals(uniqueId) && ticket.getStatus() == 0) {
-                tickets.add(ticket);
+                getCachedTicket(ticket.getId()).ifPresent(tickets::add);
             }
         }
         
@@ -100,7 +100,7 @@ public class DataManager {
         Set<TicketData> tickets = Sets.newHashSet();
         for (TicketData ticket : getTicketCache().asMap().values()) {
             if (ticket.getStatus() == 0) {
-                tickets.add(ticket);
+                getCachedTicket(ticket.getId()).ifPresent(tickets::add);
             }
         }
         
@@ -111,7 +111,7 @@ public class DataManager {
         Set<TicketData> tickets = Sets.newHashSet();
         for (TicketData ticket : getTicketCache().asMap().values()) {
             if (ticket.getUser().equals(uniqueId) && ticket.getStatus() == 1 && !ticket.isRead()) {
-                tickets.add(ticket);
+                getCachedTicket(ticket.getId()).ifPresent(tickets::add);
             }
         }
         

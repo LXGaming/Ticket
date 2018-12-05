@@ -66,5 +66,6 @@ public class VelocityListener {
     public void onDisconnect(DisconnectEvent event) {
         // Forces the expiry to be recalculated
         DataManager.getCachedUser(event.getPlayer().getUniqueId());
+        DataManager.getCachedUnreadTickets(event.getPlayer().getUniqueId());
     }
 }

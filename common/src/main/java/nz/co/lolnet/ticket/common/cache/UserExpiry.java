@@ -28,30 +28,26 @@ public class UserExpiry implements Expiry<UUID, UserData> {
     
     @Override
     public long expireAfterCreate(UUID key, UserData value, long currentTime) {
-        if (Ticket.getInstance().getPlatform().isOnline(key) || !DataManager.getCachedOpenTickets(key).isEmpty()) {
-            return Long.MAX_VALUE;
-        }
-        
-        return Duration.ofHours(1L).toNanos();
+        return getExpiry(value).toNanos();
     }
     
     @Override
     public long expireAfterUpdate(UUID key, UserData value, long currentTime, long currentDuration) {
-        if (Ticket.getInstance().getPlatform().isOnline(key) || !DataManager.getCachedOpenTickets(key).isEmpty()) {
-            return Long.MAX_VALUE;
-        }
-        
-        return Duration.ofHours(1L).toNanos();
+        return getExpiry(value).toNanos();
     }
     
     @Override
     public long expireAfterRead(UUID key, UserData value, long currentTime, long currentDuration) {
-        if (Ticket.getInstance().getPlatform().isOnline(key) || !DataManager.getCachedOpenTickets(key).isEmpty()) {
-            Ticket.getInstance().getLogger().debug("UserExpiry::read - Infinite");
-            return Long.MAX_VALUE;
+        return getExpiry(value).toNanos();
+    }
+    
+    private Duration getExpiry(UserData user) {
+        if (Ticket.getInstance().getPlatform().isOnline(user.getUniqueId()) || !DataManager.getCachedOpenTickets(user.getUniqueId()).isEmpty()) {
+            Ticket.getInstance().getLogger().debug("UserExpiry - {} ({}) Infinite", user.getName(), user.getUniqueId());
+            return Duration.ofNanos(Long.MAX_VALUE);
         }
         
-        Ticket.getInstance().getLogger().debug("UserExpiry::read - 1 Hour");
-        return Duration.ofHours(1L).toNanos();
+        Ticket.getInstance().getLogger().debug("UserExpiry - {} ({}) 1 Hour", user.getName(), user.getUniqueId());
+        return Duration.ofHours(1L);
     }
 }

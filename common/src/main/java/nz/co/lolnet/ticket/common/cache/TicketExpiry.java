@@ -26,45 +26,31 @@ public class TicketExpiry implements Expiry<Integer, TicketData> {
     
     @Override
     public long expireAfterCreate(Integer key, TicketData value, long currentTime) {
-        if (value.getStatus() == 0) {
-            return Long.MAX_VALUE;
-        }
-        
-        if (value.getStatus() == 1 && !value.isRead() && Ticket.getInstance().getPlatform().isOnline(value.getUser())) {
-            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
-            return Long.MAX_VALUE;
-        }
-        
-        return Duration.ofHours(1L).toNanos();
+        return getExpiry(value).toNanos();
     }
     
     @Override
     public long expireAfterUpdate(Integer key, TicketData value, long currentTime, long currentDuration) {
-        if (value.getStatus() == 0) {
-            return Long.MAX_VALUE;
-        }
-        
-        if (value.getStatus() == 1 && !value.isRead() && Ticket.getInstance().getPlatform().isOnline(value.getUser())) {
-            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
-            return Long.MAX_VALUE;
-        }
-        
-        return Duration.ofHours(1L).toNanos();
+        return getExpiry(value).toNanos();
     }
     
     @Override
     public long expireAfterRead(Integer key, TicketData value, long currentTime, long currentDuration) {
-        if (value.getStatus() == 0) {
-            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
-            return Long.MAX_VALUE;
+        return getExpiry(value).toNanos();
+    }
+    
+    private Duration getExpiry(TicketData ticket) {
+        if (ticket.getStatus() == 0) {
+            Ticket.getInstance().getLogger().debug("TicketExpiry - #{} Infinite", ticket.getId());
+            return Duration.ofNanos(Long.MAX_VALUE);
         }
         
-        if (value.getStatus() == 1 && !value.isRead() && Ticket.getInstance().getPlatform().isOnline(value.getUser())) {
-            Ticket.getInstance().getLogger().debug("TicketExpiry::read - Infinite");
-            return Long.MAX_VALUE;
+        if (ticket.getStatus() == 1 && !ticket.isRead() && Ticket.getInstance().getPlatform().isOnline(ticket.getUser())) {
+            Ticket.getInstance().getLogger().debug("TicketExpiry - #{} Infinite", ticket.getId());
+            return Duration.ofNanos(Long.MAX_VALUE);
         }
         
-        Ticket.getInstance().getLogger().debug("TicketExpiry::read - 1 Hour");
-        return Duration.ofHours(1L).toNanos();
+        Ticket.getInstance().getLogger().debug("TicketExpiry - #{} 1 Hour", ticket.getId());
+        return Duration.ofHours(1L);
     }
 }

@@ -66,5 +66,6 @@ public class BungeeListener implements Listener {
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         // Forces the expiry to be recalculated
         DataManager.getCachedUser(event.getPlayer().getUniqueId());
+        DataManager.getCachedUnreadTickets(event.getPlayer().getUniqueId());
     }
 }
