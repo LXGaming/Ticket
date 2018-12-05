@@ -40,6 +40,10 @@ public class BungeeListener implements Listener {
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
         BungeePlugin.getInstance().getProxy().getScheduler().schedule(BungeePlugin.getInstance(), () -> {
+            if (!event.getPlayer().isConnected()) {
+                return;
+            }
+            
             UserData user = DataManager.getUser(event.getPlayer().getUniqueId()).orElse(null);
             if (user == null) {
                 return;

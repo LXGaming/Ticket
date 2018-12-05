@@ -40,6 +40,10 @@ public class VelocityListener {
     @Subscribe
     public void onPostLogin(PostLoginEvent event) {
         VelocityPlugin.getInstance().getProxy().getScheduler().buildTask(VelocityPlugin.getInstance(), () -> {
+            if (!event.getPlayer().isActive()) {
+                return;
+            }
+            
             UserData user = DataManager.getUser(event.getPlayer().getUniqueId()).orElse(null);
             if (user == null) {
                 return;
