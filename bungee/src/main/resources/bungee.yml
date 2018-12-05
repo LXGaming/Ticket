@@ -4,3 +4,4 @@ version: ${version}
 description: Ticket System
 author: LX_Gaming
 website: https://www.lolnet.co.nz
+softDepends: [Location, RedisBungee]

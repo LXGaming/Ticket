@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
@@ -57,7 +58,11 @@ import java.util.UUID;
         version = Reference.VERSION,
         description = Reference.DESCRIPTION,
         url = Reference.WEBSITE,
-        authors = {Reference.AUTHORS}
+        authors = {Reference.AUTHORS},
+        dependencies = {
+                @Dependency(id = "location", optional = true),
+                @Dependency(id = "redisvelocity", optional = true)
+        }
 )
 public class VelocityPlugin implements Platform {
     
