@@ -30,6 +30,7 @@ import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
+import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
@@ -62,7 +63,10 @@ public class BungeeListener implements Listener {
                 return;
             }
             
-            event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix().append("You have " + tickets.size() + " unread tickets").color(ChatColor.GOLD).create());
+            event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix()
+                    .append("You have "+ tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"))
+                    .color(ChatColor.GOLD)
+                    .create());
         }, TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS);
     }
     

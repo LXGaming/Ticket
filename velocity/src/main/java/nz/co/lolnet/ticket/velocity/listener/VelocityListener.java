@@ -28,6 +28,7 @@ import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
+import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +63,8 @@ public class VelocityListener {
                 return;
             }
             
-            event.getPlayer().sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You have " + tickets.size() + " unread tickets", TextColor.GOLD)));
+            event.getPlayer().sendMessage(VelocityToolbox.getTextPrefix()
+                    .append(TextComponent.of("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"), TextColor.GOLD)));
         }).delay(TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS).schedule();
     }
     
