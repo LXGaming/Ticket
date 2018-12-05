@@ -22,7 +22,10 @@ import com.google.gson.JsonParser;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -110,6 +113,14 @@ public class Toolbox {
         BigDecimal bigDecimal = new BigDecimal(value);
         bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);
         return bigDecimal.doubleValue();
+    }
+    
+    public static Optional<String> formatInstant(String pattern, Instant instant) {
+        try {
+            return Optional.of(new SimpleDateFormat(pattern).format(Date.from(instant)));
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
     
     public static String substring(String string, int endIndex) {

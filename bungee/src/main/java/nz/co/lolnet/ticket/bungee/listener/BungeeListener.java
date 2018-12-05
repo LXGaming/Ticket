@@ -64,7 +64,7 @@ public class BungeeListener implements Listener {
             }
             
             event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix()
-                    .append("You have "+ tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"))
+                    .append("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"))
                     .color(ChatColor.GOLD)
                     .create());
         }, TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS);

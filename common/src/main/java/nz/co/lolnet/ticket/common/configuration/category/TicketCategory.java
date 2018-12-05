@@ -18,9 +18,14 @@ package nz.co.lolnet.ticket.common.configuration.category;
 
 public class TicketCategory {
     
+    private String dateFormat = "dd/MM/yyyy 'at' HH:mm:ss z";
     private long delay = 60000L;
     private int maximumTickets = 3;
     private int minimumWords = 3;
+    
+    public String getDateFormat() {
+        return dateFormat;
+    }
     
     public long getDelay() {
         return delay;

@@ -25,7 +25,10 @@ import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -112,6 +115,10 @@ public class ReadCommand extends AbstractCommand {
         textBuilder.append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true));
         textBuilder.append(Components.newline());
         
+        textBuilder.append(TextComponent.of("Time", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
+        textBuilder.append(TextComponent.of(TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDateFormat).flatMap(pattern -> Toolbox.formatInstant(pattern, ticket.getTimestamp())).orElse("Unknown")));
+        
+        textBuilder.append(Components.newline());
         textBuilder.append(TextComponent.of("Status", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         if (ticket.getStatus() == 0) {
             textBuilder.append(TextComponent.of("Open", TextColor.GREEN));

@@ -25,7 +25,10 @@ import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Config;
+import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
@@ -111,6 +114,10 @@ public class ReadCommand extends AbstractCommand {
         componentBuilder.append("----------").color(ChatColor.GREEN).strikethrough(true);
         componentBuilder.append("\n", ComponentBuilder.FormatRetention.NONE);
         
+        componentBuilder.append("Time").color(ChatColor.AQUA).append(": ").color(ChatColor.WHITE);
+        componentBuilder.append(TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDateFormat).flatMap(pattern -> Toolbox.formatInstant(pattern, ticket.getTimestamp())).orElse("Unknown"));
+        
+        componentBuilder.append("\n");
         componentBuilder.append("Status").color(ChatColor.AQUA).append(": ").color(ChatColor.WHITE);
         if (ticket.getStatus() == 0) {
             componentBuilder.append("Open").color(ChatColor.GREEN);
