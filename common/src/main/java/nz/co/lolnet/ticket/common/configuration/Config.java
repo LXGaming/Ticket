@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.ticket.common.configuration;
 
+import nz.co.lolnet.ticket.common.configuration.category.CommandCategory;
 import nz.co.lolnet.ticket.common.configuration.category.StorageCategory;
 import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 
@@ -26,6 +27,7 @@ public class Config {
     private boolean debug = false;
     private String proxyId = UUID.randomUUID().toString();
     private long loginDelay = 2500L;
+    private CommandCategory command = new CommandCategory();
     private TicketCategory ticket = new TicketCategory();
     private StorageCategory storage = new StorageCategory();
     
@@ -43,6 +45,10 @@ public class Config {
     
     public long getLoginDelay() {
         return loginDelay;
+    }
+    
+    public CommandCategory getCommand() {
+        return command;
     }
     
     public TicketCategory getTicket() {

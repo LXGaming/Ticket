@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.ticket.common;
 
+import com.google.common.collect.Maps;
 import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.util.Reference;
@@ -24,18 +25,22 @@ import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.LoggerImpl;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class TicketImpl extends Ticket {
     
     private final Configuration configuration;
+    private final Map<String, String> legacyCommands;
     
     public TicketImpl(Platform platform) {
         super();
         this.platform = platform;
         this.logger = new LoggerImpl();
         this.configuration = new Configuration();
+        this.legacyCommands = Maps.newHashMap();
     }
     
     public void loadTicket() {
@@ -56,6 +61,19 @@ public class TicketImpl extends Ticket {
         } else {
             getLogger().info("Debug mode disabled");
         }
+        
+        getLegacyCommands().clear();
+        getConfig().map(Config::getCommand).ifPresent(command -> {
+            if (!command.isLegacy()) {
+                return;
+            }
+            
+            getLegacyCommands().put(StringUtils.defaultIfBlank(command.getCloseTicket(), ""), "close");
+            getLegacyCommands().put(StringUtils.defaultIfBlank(command.getCommentTicket(), ""), "comment");
+            getLegacyCommands().put(StringUtils.defaultIfBlank(command.getOpenTicket(), ""), "open");
+            getLegacyCommands().put(StringUtils.defaultIfBlank(command.getReadTicket(), ""), "read");
+            getLegacyCommands().put(StringUtils.defaultIfBlank(command.getReopenTicket(), ""), "reopen");
+        });
         
         if (!MySQLQuery.createTables()) {
             return false;
@@ -85,5 +103,9 @@ public class TicketImpl extends Ticket {
         }
         
         return Optional.empty();
+    }
+    
+    public Map<String, String> getLegacyCommands() {
+        return legacyCommands;
     }
 }
