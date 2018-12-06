@@ -55,33 +55,33 @@ public class ReadCommand extends AbstractCommand {
                 return !BungeeToolbox.getUniqueId(sender).equals(ticket.getUser()) && !sender.hasPermission("ticket.read.others");
             });
             
-            if (openTickets.isEmpty()) {
-                sender.sendMessage(BungeeToolbox.getTextPrefix().append("There are no open tickets").color(ChatColor.YELLOW).create());
-                return;
+            if (!openTickets.isEmpty()) {
+                sender.sendMessage(new ComponentBuilder("")
+                        .append("----------").color(ChatColor.GREEN).strikethrough(true)
+                        .append(" " + openTickets.size()).color(ChatColor.YELLOW).strikethrough(false)
+                        .append(" Open " + Toolbox.formatUnit(openTickets.size(), "Ticket", "Tickets") + " ").color(ChatColor.GREEN)
+                        .append("----------").color(ChatColor.GREEN).strikethrough(true)
+                        .create());
+                
+                openTickets.forEach(ticket -> sender.sendMessage(buildTicket(ticket)));
             }
-            
-            sender.sendMessage(new ComponentBuilder("")
-                    .append("----------").color(ChatColor.GREEN).strikethrough(true)
-                    .append(" " + openTickets.size()).color(ChatColor.YELLOW).strikethrough(false)
-                    .append(" Open " + Toolbox.formatUnit(openTickets.size(), "Ticket", "Tickets") + " ").color(ChatColor.GREEN)
-                    .append("----------").color(ChatColor.GREEN).strikethrough(true)
-                    .create());
-            
-            openTickets.forEach(ticket -> sender.sendMessage(buildTicket(ticket)));
             
             Set<TicketData> unreadTickets = DataManager.getCachedUnreadTickets(BungeeToolbox.getUniqueId(sender));
-            if (unreadTickets.isEmpty()) {
-                return;
+            if (!unreadTickets.isEmpty()) {
+                sender.sendMessage(new ComponentBuilder("")
+                        .append("----------").color(ChatColor.GREEN).strikethrough(true)
+                        .append(" " + unreadTickets.size()).color(ChatColor.YELLOW).strikethrough(false)
+                        .append(" Unread " + Toolbox.formatUnit(unreadTickets.size(), "Ticket", "Tickets") + " ").color(ChatColor.GREEN)
+                        .append("----------").color(ChatColor.GREEN).strikethrough(true)
+                        .create());
+                
+                unreadTickets.forEach(ticket -> sender.sendMessage(buildTicket(ticket)));
             }
             
-            sender.sendMessage(new ComponentBuilder("")
-                    .append("----------").color(ChatColor.GREEN).strikethrough(true)
-                    .append(" " + unreadTickets.size()).color(ChatColor.YELLOW).strikethrough(false)
-                    .append(" Unread " + Toolbox.formatUnit(unreadTickets.size(), "Ticket", "Tickets") + " ").color(ChatColor.GREEN)
-                    .append("----------").color(ChatColor.GREEN).strikethrough(true)
-                    .create());
+            if (openTickets.isEmpty() && unreadTickets.isEmpty()) {
+                sender.sendMessage(BungeeToolbox.getTextPrefix().append("There are no open tickets").color(ChatColor.YELLOW).create());
+            }
             
-            unreadTickets.forEach(ticket -> sender.sendMessage(buildTicket(ticket)));
             return;
         }
         

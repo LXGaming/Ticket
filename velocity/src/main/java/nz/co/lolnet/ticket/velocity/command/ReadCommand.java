@@ -56,33 +56,33 @@ public class ReadCommand extends AbstractCommand {
                 return !VelocityToolbox.getUniqueId(source).equals(ticket.getUser()) && !source.hasPermission("ticket.read.others");
             });
             
-            if (openTickets.isEmpty()) {
-                source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("There are no open tickets", TextColor.YELLOW)));
-                return;
+            if (!openTickets.isEmpty()) {
+                source.sendMessage(TextComponent.builder("")
+                        .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
+                        .append(TextComponent.of(" " + openTickets.size(), TextColor.YELLOW).decoration(TextDecoration.STRIKETHROUGH, false))
+                        .append(TextComponent.of(" Open " + Toolbox.formatUnit(openTickets.size(), "Ticket", "Tickets") + " ", TextColor.GREEN))
+                        .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
+                        .build());
+                
+                openTickets.forEach(ticket -> source.sendMessage(buildTicket(ticket)));
             }
-            
-            source.sendMessage(TextComponent.builder("")
-                    .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
-                    .append(TextComponent.of(" " + openTickets.size(), TextColor.YELLOW).decoration(TextDecoration.STRIKETHROUGH, false))
-                    .append(TextComponent.of(" Open " + Toolbox.formatUnit(openTickets.size(), "Ticket", "Tickets") + " ", TextColor.GREEN))
-                    .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
-                    .build());
-            
-            openTickets.forEach(ticket -> source.sendMessage(buildTicket(ticket)));
             
             Set<TicketData> unreadTickets = DataManager.getCachedUnreadTickets(VelocityToolbox.getUniqueId(source));
-            if (unreadTickets.isEmpty()) {
-                return;
+            if (!unreadTickets.isEmpty()) {
+                source.sendMessage(TextComponent.builder("")
+                        .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
+                        .append(TextComponent.of(" " + unreadTickets.size(), TextColor.YELLOW).decoration(TextDecoration.STRIKETHROUGH, false))
+                        .append(TextComponent.of(" Unread " + Toolbox.formatUnit(unreadTickets.size(), "Ticket", "Tickets") + " ", TextColor.GREEN))
+                        .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
+                        .build());
+                
+                unreadTickets.forEach(ticket -> source.sendMessage(buildTicket(ticket)));
             }
             
-            source.sendMessage(TextComponent.builder("")
-                    .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
-                    .append(TextComponent.of(" " + unreadTickets.size(), TextColor.YELLOW).decoration(TextDecoration.STRIKETHROUGH, false))
-                    .append(TextComponent.of(" Unread " + Toolbox.formatUnit(unreadTickets.size(), "Ticket", "Tickets") + " ", TextColor.GREEN))
-                    .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))
-                    .build());
+            if (openTickets.isEmpty() && unreadTickets.isEmpty()) {
+                source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("There are no open tickets", TextColor.YELLOW)));
+            }
             
-            unreadTickets.forEach(ticket -> source.sendMessage(buildTicket(ticket)));
             return;
         }
         
