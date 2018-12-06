@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.ticket.bungee.util;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import net.md_5.bungee.api.ChatColor;
@@ -70,7 +71,7 @@ public class BungeeToolbox {
             jsonObject.addProperty("id", TicketImpl.getInstance().getConfig().map(Config::getProxyId).orElse(null));
             jsonObject.addProperty("type", type);
             consumer.accept(jsonObject);
-            RedisBungee.getApi().sendChannelMessage(Reference.ID, Configuration.getGson().toJson(jsonObject));
+            RedisBungee.getApi().sendChannelMessage(Reference.ID, new Gson().toJson(jsonObject));
         }
     }
     

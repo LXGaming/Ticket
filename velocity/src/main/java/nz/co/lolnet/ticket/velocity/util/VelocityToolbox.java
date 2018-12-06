@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.ticket.velocity.util;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
@@ -69,7 +70,7 @@ public class VelocityToolbox {
             jsonObject.addProperty("id", TicketImpl.getInstance().getConfig().map(Config::getProxyId).orElse(null));
             jsonObject.addProperty("type", type);
             consumer.accept(jsonObject);
-            RedisVelocity.getInstance().sendMessage(Reference.ID, Configuration.getGson().toJson(jsonObject));
+            RedisVelocity.getInstance().sendMessage(Reference.ID, new Gson().toJson(jsonObject));
         }
     }
     
