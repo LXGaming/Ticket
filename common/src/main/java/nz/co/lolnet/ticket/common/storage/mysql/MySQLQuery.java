@@ -29,8 +29,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public class MySQLQuery {
@@ -117,7 +117,7 @@ public class MySQLQuery {
             ticket.setTimestamp(timestamp);
             ticket.setLocation(location);
             ticket.setText(text);
-            ticket.setComments(Sets.newHashSet());
+            ticket.setComments(Sets.newTreeSet());
             return ticket;
         }
     }
@@ -139,13 +139,13 @@ public class MySQLQuery {
         }
     }
     
-    public static Optional<Set<CommentData>> getComments(int ticketId) throws SQLException {
+    public static Optional<Collection<CommentData>> getComments(int ticketId) throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
             storageAdapter.createConnection().prepareStatement("SELECT * FROM `comment` WHERE `ticket` = ?");
             storageAdapter.getPreparedStatement().setInt(1, ticketId);
             ResultSet resultSet = storageAdapter.execute();
             
-            Set<CommentData> comments = Sets.newHashSet();
+            Collection<CommentData> comments = Sets.newTreeSet();
             while (resultSet.next()) {
                 CommentData comment = new CommentData();
                 comment.setId(resultSet.getInt("id"));
@@ -177,17 +177,17 @@ public class MySQLQuery {
             ticket.setText(resultSet.getString("text"));
             ticket.setStatus(resultSet.getInt("status"));
             ticket.setRead(resultSet.getBoolean("read"));
-            ticket.setComments(Sets.newHashSet());
+            ticket.setComments(Sets.newTreeSet());
             return Optional.of(ticket);
         }
     }
     
-    public static Optional<Set<Integer>> getOpenTickets() throws SQLException {
+    public static Optional<Collection<Integer>> getOpenTickets() throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
             storageAdapter.createConnection().prepareStatement("SELECT `id` FROM `ticket` WHERE `status` = ?");
             storageAdapter.getPreparedStatement().setInt(1, 0);
             ResultSet resultSet = storageAdapter.execute();
-            Set<Integer> ticketIds = Sets.newHashSet();
+            Collection<Integer> ticketIds = Sets.newTreeSet();
             while (resultSet.next()) {
                 ticketIds.add(resultSet.getInt("id"));
             }
@@ -196,14 +196,14 @@ public class MySQLQuery {
         }
     }
     
-    public static Optional<Set<Integer>> getUnreadTickets(UUID uniqueId) throws SQLException {
+    public static Optional<Collection<Integer>> getUnreadTickets(UUID uniqueId) throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
             storageAdapter.createConnection().prepareStatement("SELECT `id` FROM `ticket` WHERE `user` = ? AND `status` = ? AND `read` = ?");
             storageAdapter.getPreparedStatement().setString(1, uniqueId.toString());
             storageAdapter.getPreparedStatement().setInt(2, 1);
             storageAdapter.getPreparedStatement().setInt(3, 0);
             ResultSet resultSet = storageAdapter.execute();
-            Set<Integer> ticketIds = Sets.newHashSet();
+            Collection<Integer> ticketIds = Sets.newTreeSet();
             while (resultSet.next()) {
                 ticketIds.add(resultSet.getInt("id"));
             }
@@ -229,12 +229,12 @@ public class MySQLQuery {
         }
     }
     
-    public static Optional<Set<UUID>> getUsers(String name) throws SQLException {
+    public static Optional<Collection<UUID>> getUsers(String name) throws SQLException {
         try (MySQLStorageAdapter storageAdapter = new MySQLStorageAdapter()) {
             storageAdapter.createConnection().prepareStatement("SELECT `unique_id` FROM `user` WHERE `name` = ?");
             storageAdapter.getPreparedStatement().setString(1, name);
             ResultSet resultSet = storageAdapter.execute();
-            Set<UUID> uniqueIds = Sets.newHashSet();
+            Collection<UUID> uniqueIds = Sets.newHashSet();
             while (resultSet.next()) {
                 uniqueIds.add(UUID.fromString(resultSet.getString("unique_id")));
             }

@@ -34,8 +34,8 @@ import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class ReadCommand extends AbstractCommand {
     
@@ -50,7 +50,7 @@ public class ReadCommand extends AbstractCommand {
     public void execute(Object object, List<String> arguments) {
         CommandSender sender = (CommandSender) object;
         if (arguments.isEmpty()) {
-            Set<TicketData> openTickets = DataManager.getCachedOpenTickets();
+            Collection<TicketData> openTickets = DataManager.getCachedOpenTickets();
             openTickets.removeIf(ticket -> {
                 return !BungeeToolbox.getUniqueId(sender).equals(ticket.getUser()) && !sender.hasPermission("ticket.read.others");
             });
@@ -66,7 +66,7 @@ public class ReadCommand extends AbstractCommand {
                 openTickets.forEach(ticket -> sender.sendMessage(buildTicket(ticket)));
             }
             
-            Set<TicketData> unreadTickets = DataManager.getCachedUnreadTickets(BungeeToolbox.getUniqueId(sender));
+            Collection<TicketData> unreadTickets = DataManager.getCachedUnreadTickets(BungeeToolbox.getUniqueId(sender));
             if (!unreadTickets.isEmpty()) {
                 sender.sendMessage(new ComponentBuilder("")
                         .append("----------").color(ChatColor.GREEN).strikethrough(true)

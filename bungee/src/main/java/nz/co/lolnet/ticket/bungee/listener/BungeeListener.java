@@ -39,8 +39,8 @@ import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class BungeeListener implements Listener {
@@ -65,7 +65,7 @@ public class BungeeListener implements Listener {
                 }
             }
             
-            Set<TicketData> tickets = DataManager.getUnreadTickets(user.getUniqueId()).orElse(null);
+            Collection<TicketData> tickets = DataManager.getUnreadTickets(user.getUniqueId()).orElse(null);
             if (tickets == null || tickets.isEmpty()) {
                 return;
             }

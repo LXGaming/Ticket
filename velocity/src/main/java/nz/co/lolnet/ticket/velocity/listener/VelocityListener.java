@@ -33,7 +33,7 @@ import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 public class VelocityListener {
@@ -58,7 +58,7 @@ public class VelocityListener {
                 }
             }
             
-            Set<TicketData> tickets = DataManager.getUnreadTickets(user.getUniqueId()).orElse(null);
+            Collection<TicketData> tickets = DataManager.getUnreadTickets(user.getUniqueId()).orElse(null);
             if (tickets == null || tickets.isEmpty()) {
                 return;
             }

@@ -29,8 +29,8 @@ import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class UserCommand extends AbstractCommand {
@@ -72,7 +72,7 @@ public class UserCommand extends AbstractCommand {
             return;
         }
         
-        Set<UserData> users = DataManager.getUsers(data).orElse(null);
+        Collection<UserData> users = DataManager.getUsers(data).orElse(null);
         if (users == null || users.isEmpty()) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Fail to find users by the name of ").color(ChatColor.RED).append(data).color(ChatColor.YELLOW).create());
             return;

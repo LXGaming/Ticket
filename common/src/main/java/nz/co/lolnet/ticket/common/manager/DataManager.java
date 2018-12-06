@@ -30,8 +30,8 @@ import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public class DataManager {
@@ -54,14 +54,14 @@ public class DataManager {
         }));
     }
     
-    public static Optional<Set<UserData>> getUsers(String name) {
+    public static Optional<Collection<UserData>> getUsers(String name) {
         try {
-            Set<UUID> uniqueIds = MySQLQuery.getUsers(name).orElse(null);
+            Collection<UUID> uniqueIds = MySQLQuery.getUsers(name).orElse(null);
             if (uniqueIds == null || uniqueIds.isEmpty()) {
                 return Optional.empty();
             }
             
-            Set<UserData> users = Sets.newHashSet();
+            Collection<UserData> users = Sets.newHashSet();
             uniqueIds.forEach(uniqueId -> getUser(uniqueId).map(users::add));
             return Optional.of(users);
         } catch (SQLException ex) {
@@ -85,8 +85,8 @@ public class DataManager {
         }));
     }
     
-    public static Set<TicketData> getCachedOpenTickets(UUID uniqueId) {
-        Set<TicketData> tickets = Sets.newHashSet();
+    public static Collection<TicketData> getCachedOpenTickets(UUID uniqueId) {
+        Collection<TicketData> tickets = Sets.newTreeSet();
         for (TicketData ticket : getTicketCache().asMap().values()) {
             if (ticket.getUser().equals(uniqueId) && ticket.getStatus() == 0) {
                 getCachedTicket(ticket.getId()).ifPresent(tickets::add);
@@ -96,8 +96,8 @@ public class DataManager {
         return tickets;
     }
     
-    public static Set<TicketData> getCachedOpenTickets() {
-        Set<TicketData> tickets = Sets.newHashSet();
+    public static Collection<TicketData> getCachedOpenTickets() {
+        Collection<TicketData> tickets = Sets.newTreeSet();
         for (TicketData ticket : getTicketCache().asMap().values()) {
             if (ticket.getStatus() == 0) {
                 getCachedTicket(ticket.getId()).ifPresent(tickets::add);
@@ -107,8 +107,8 @@ public class DataManager {
         return tickets;
     }
     
-    public static Set<TicketData> getCachedUnreadTickets(UUID uniqueId) {
-        Set<TicketData> tickets = Sets.newHashSet();
+    public static Collection<TicketData> getCachedUnreadTickets(UUID uniqueId) {
+        Collection<TicketData> tickets = Sets.newTreeSet();
         for (TicketData ticket : getTicketCache().asMap().values()) {
             if (ticket.getUser().equals(uniqueId) && ticket.getStatus() == 1 && !ticket.isRead()) {
                 getCachedTicket(ticket.getId()).ifPresent(tickets::add);
@@ -122,14 +122,14 @@ public class DataManager {
         return Optional.ofNullable(getTicketCache().getIfPresent(ticketId));
     }
     
-    public static Optional<Set<TicketData>> getOpenTickets() {
+    public static Optional<Collection<TicketData>> getOpenTickets() {
         try {
-            Set<Integer> ticketIds = MySQLQuery.getOpenTickets().orElse(null);
+            Collection<Integer> ticketIds = MySQLQuery.getOpenTickets().orElse(null);
             if (ticketIds == null || ticketIds.isEmpty()) {
                 return Optional.empty();
             }
             
-            Set<TicketData> tickets = Sets.newHashSet();
+            Collection<TicketData> tickets = Sets.newTreeSet();
             ticketIds.forEach(ticketId -> getTicket(ticketId).map(tickets::add));
             return Optional.of(tickets);
         } catch (SQLException ex) {
@@ -137,14 +137,14 @@ public class DataManager {
         }
     }
     
-    public static Optional<Set<TicketData>> getUnreadTickets(UUID uniqueId) {
+    public static Optional<Collection<TicketData>> getUnreadTickets(UUID uniqueId) {
         try {
-            Set<Integer> ticketIds = MySQLQuery.getUnreadTickets(uniqueId).orElse(null);
+            Collection<Integer> ticketIds = MySQLQuery.getUnreadTickets(uniqueId).orElse(null);
             if (ticketIds == null || ticketIds.isEmpty()) {
                 return Optional.empty();
             }
             
-            Set<TicketData> tickets = Sets.newHashSet();
+            Collection<TicketData> tickets = Sets.newTreeSet();
             ticketIds.forEach(ticketId -> getTicket(ticketId).map(tickets::add));
             return Optional.of(tickets);
         } catch (SQLException ex) {

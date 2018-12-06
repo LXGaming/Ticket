@@ -34,8 +34,8 @@ import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class OpenCommand extends AbstractCommand {
     
@@ -79,7 +79,7 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
-        Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
+        Collection<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
         if (!sender.hasPermission("ticket.open.exempt.max")) {
             if (tickets.size() >= TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getMaximumTickets).orElse(0)) {
                 sender.sendMessage(BungeeToolbox.getTextPrefix().append("You have too many open tickets").color(ChatColor.RED).create());

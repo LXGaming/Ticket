@@ -35,8 +35,8 @@ import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class ReadCommand extends AbstractCommand {
     
@@ -51,7 +51,7 @@ public class ReadCommand extends AbstractCommand {
     public void execute(Object object, List<String> arguments) {
         CommandSource source = (CommandSource) object;
         if (arguments.isEmpty()) {
-            Set<TicketData> openTickets = DataManager.getCachedOpenTickets();
+            Collection<TicketData> openTickets = DataManager.getCachedOpenTickets();
             openTickets.removeIf(ticket -> {
                 return !VelocityToolbox.getUniqueId(source).equals(ticket.getUser()) && !source.hasPermission("ticket.read.others");
             });
@@ -67,7 +67,7 @@ public class ReadCommand extends AbstractCommand {
                 openTickets.forEach(ticket -> source.sendMessage(buildTicket(ticket)));
             }
             
-            Set<TicketData> unreadTickets = DataManager.getCachedUnreadTickets(VelocityToolbox.getUniqueId(source));
+            Collection<TicketData> unreadTickets = DataManager.getCachedUnreadTickets(VelocityToolbox.getUniqueId(source));
             if (!unreadTickets.isEmpty()) {
                 source.sendMessage(TextComponent.builder("")
                         .append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true))

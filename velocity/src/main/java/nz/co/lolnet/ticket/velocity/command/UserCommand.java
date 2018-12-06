@@ -30,8 +30,8 @@ import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class UserCommand extends AbstractCommand {
@@ -73,7 +73,7 @@ public class UserCommand extends AbstractCommand {
             return;
         }
         
-        Set<UserData> users = DataManager.getUsers(data).orElse(null);
+        Collection<UserData> users = DataManager.getUsers(data).orElse(null);
         if (users == null || users.isEmpty()) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Fail to find users by the name of ", TextColor.RED)).append(TextComponent.of(data, TextColor.YELLOW)));
             return;

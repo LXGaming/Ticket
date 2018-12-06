@@ -17,8 +17,8 @@
 package nz.co.lolnet.ticket.api.data;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 public class TicketData implements Comparable<TicketData> {
@@ -30,7 +30,7 @@ public class TicketData implements Comparable<TicketData> {
     private String text;
     private int status;
     private boolean read;
-    private Set<CommentData> comments;
+    private Collection<CommentData> comments;
     
     public int getId() {
         return id;
@@ -88,11 +88,11 @@ public class TicketData implements Comparable<TicketData> {
         this.read = read;
     }
     
-    public Set<CommentData> getComments() {
+    public Collection<CommentData> getComments() {
         return comments;
     }
     
-    public void setComments(Set<CommentData> comments) {
+    public void setComments(Collection<CommentData> comments) {
         this.comments = comments;
     }
     

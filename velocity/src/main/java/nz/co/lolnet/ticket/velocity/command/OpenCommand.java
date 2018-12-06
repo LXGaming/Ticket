@@ -37,8 +37,8 @@ import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class OpenCommand extends AbstractCommand {
     
@@ -82,7 +82,7 @@ public class OpenCommand extends AbstractCommand {
             return;
         }
         
-        Set<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
+        Collection<TicketData> tickets = DataManager.getCachedOpenTickets(user.getUniqueId());
         if (!source.hasPermission("ticket.open.exempt.max")) {
             if (tickets.size() >= TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getMaximumTickets).orElse(0)) {
                 source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You have too many open tickets", TextColor.RED)));
