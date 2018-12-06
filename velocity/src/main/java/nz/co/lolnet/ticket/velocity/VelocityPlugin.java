@@ -42,6 +42,7 @@ import nz.co.lolnet.ticket.velocity.command.OpenCommand;
 import nz.co.lolnet.ticket.velocity.command.PardonCommand;
 import nz.co.lolnet.ticket.velocity.command.ReadCommand;
 import nz.co.lolnet.ticket.velocity.command.ReloadCommand;
+import nz.co.lolnet.ticket.velocity.command.ReopenCommand;
 import nz.co.lolnet.ticket.velocity.command.TicketCommand;
 import nz.co.lolnet.ticket.velocity.command.UserCommand;
 import nz.co.lolnet.ticket.velocity.listener.RedisListener;
@@ -100,6 +101,7 @@ public class VelocityPlugin implements Platform {
         CommandManager.registerCommand(PardonCommand.class);
         CommandManager.registerCommand(ReadCommand.class);
         CommandManager.registerCommand(ReloadCommand.class);
+        CommandManager.registerCommand(ReopenCommand.class);
         CommandManager.registerCommand(UserCommand.class);
         getProxy().getCommandManager().register(new TicketCommand(), "ticket");
         getProxy().getEventManager().register(getInstance(), new VelocityListener());

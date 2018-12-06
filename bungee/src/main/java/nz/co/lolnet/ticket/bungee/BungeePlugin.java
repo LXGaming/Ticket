@@ -33,6 +33,7 @@ import nz.co.lolnet.ticket.bungee.command.OpenCommand;
 import nz.co.lolnet.ticket.bungee.command.PardonCommand;
 import nz.co.lolnet.ticket.bungee.command.ReadCommand;
 import nz.co.lolnet.ticket.bungee.command.ReloadCommand;
+import nz.co.lolnet.ticket.bungee.command.ReopenCommand;
 import nz.co.lolnet.ticket.bungee.command.TicketCommand;
 import nz.co.lolnet.ticket.bungee.command.UserCommand;
 import nz.co.lolnet.ticket.bungee.listener.BungeeListener;
@@ -74,6 +75,7 @@ public class BungeePlugin extends Plugin implements Platform {
         CommandManager.registerCommand(PardonCommand.class);
         CommandManager.registerCommand(ReadCommand.class);
         CommandManager.registerCommand(ReloadCommand.class);
+        CommandManager.registerCommand(ReopenCommand.class);
         CommandManager.registerCommand(UserCommand.class);
         getProxy().getPluginManager().registerCommand(getInstance(), new TicketCommand());
         getProxy().getPluginManager().registerListener(getInstance(), new BungeeListener());
