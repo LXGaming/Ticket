@@ -75,6 +75,12 @@ public class RedisListener implements Listener {
             if (ticket != null && user != null) {
                 onTicketOpen(ticket, user);
             }
+        } else if (type.equals("TicketReopen")) {
+            TicketData ticket = Toolbox.parseJson(jsonObject.get("ticket"), TicketData.class).orElse(null);
+            String sender = Toolbox.parseJson(jsonObject.get("by"), String.class).orElse("Unknown");
+            if (ticket != null && StringUtils.isNotBlank(sender)) {
+                onTicketReopen(ticket, sender);
+            }
         } else if (type.equals("UserBan")) {
             UserData user = Toolbox.parseJson(jsonObject.get("user"), UserData.class).orElse(null);
             String sender = Toolbox.parseJson(jsonObject.get("by"), String.class).orElse("Unknown");
@@ -126,6 +132,13 @@ public class RedisListener implements Listener {
                 .append("A new ticket has been opened by ").color(ChatColor.GREEN)
                 .append(user.getName()).color(ChatColor.YELLOW)
                 .append(", id assigned #" + ticket.getId()).color(ChatColor.GREEN).create());
+    }
+    
+    private void onTicketReopen(TicketData ticket, String sender) {
+        DataManager.getTicketCache().put(ticket.getId(), ticket);
+        BungeeToolbox.broadcast(null, "ticket.reopen.notify", BungeeToolbox.getTextPrefix()
+                .append("Ticket #" + ticket.getId() + " was reopened by ").color(ChatColor.GOLD)
+                .append(sender).color(ChatColor.YELLOW).create());
     }
     
     private void onUserBan(UserData user, String sender) {

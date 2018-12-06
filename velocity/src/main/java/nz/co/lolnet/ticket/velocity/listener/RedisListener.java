@@ -74,6 +74,12 @@ public class RedisListener {
             if (ticket != null && user != null) {
                 onTicketOpen(ticket, user);
             }
+        } else if (type.equals("TicketReopen")) {
+            TicketData ticket = Toolbox.parseJson(jsonObject.get("ticket"), TicketData.class).orElse(null);
+            String source = Toolbox.parseJson(jsonObject.get("by"), String.class).orElse("Unknown");
+            if (ticket != null && StringUtils.isNotBlank(source)) {
+                onTicketReopen(ticket, source);
+            }
         } else if (type.equals("UserBan")) {
             UserData user = Toolbox.parseJson(jsonObject.get("user"), UserData.class).orElse(null);
             String source = Toolbox.parseJson(jsonObject.get("by"), String.class).orElse("Unknown");
@@ -125,6 +131,13 @@ public class RedisListener {
                 .append(TextComponent.of("A new ticket has been opened by ", TextColor.GREEN))
                 .append(TextComponent.of(user.getName(), TextColor.YELLOW))
                 .append(TextComponent.of(", id assigned #" + ticket.getId(), TextColor.GREEN)));
+    }
+    
+    private void onTicketReopen(TicketData ticket, String source) {
+        DataManager.getTicketCache().put(ticket.getId(), ticket);
+        VelocityToolbox.broadcast(null, "ticket.reopen.notify", VelocityToolbox.getTextPrefix()
+                .append(TextComponent.of("Ticket #" + ticket.getId() + " was reopened by ", TextColor.GOLD))
+                .append(TextComponent.of(source, TextColor.YELLOW)));
     }
     
     private void onUserBan(UserData user, String source) {
