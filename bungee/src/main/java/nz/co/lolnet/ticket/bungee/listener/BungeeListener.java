@@ -52,6 +52,15 @@ public class BungeeListener implements Listener {
                 return;
             }
             
+            if (event.getPlayer().hasPermission("ticket.read.others")) {
+                Collection<TicketData> openTickets = DataManager.getCachedOpenTickets();
+                if (!openTickets.isEmpty()) {
+                    event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix()
+                            .append("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets")).color(ChatColor.GOLD)
+                            .create());
+                }
+            }
+            
             UserData user = DataManager.getUser(event.getPlayer().getUniqueId()).orElse(null);
             if (user == null) {
                 return;
@@ -71,8 +80,7 @@ public class BungeeListener implements Listener {
             }
             
             event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix()
-                    .append("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"))
-                    .color(ChatColor.GOLD)
+                    .append("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets")).color(ChatColor.GOLD)
                     .create());
         }, TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS);
     }

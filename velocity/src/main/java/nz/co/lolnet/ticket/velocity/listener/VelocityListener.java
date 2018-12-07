@@ -45,6 +45,14 @@ public class VelocityListener {
                 return;
             }
             
+            if (event.getPlayer().hasPermission("ticket.read.others")) {
+                Collection<TicketData> openTickets = DataManager.getCachedOpenTickets();
+                if (!openTickets.isEmpty()) {
+                    event.getPlayer().sendMessage(VelocityToolbox.getTextPrefix()
+                            .append(TextComponent.of("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets"), TextColor.GOLD)));
+                }
+            }
+            
             UserData user = DataManager.getUser(event.getPlayer().getUniqueId()).orElse(null);
             if (user == null) {
                 return;
