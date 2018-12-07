@@ -32,6 +32,7 @@ public class DebugCommand extends AbstractCommand {
     
     public DebugCommand() {
         addAlias("debug");
+        setDescription("For debugging purposes");
         setPermission("ticket.debug.base");
     }
     

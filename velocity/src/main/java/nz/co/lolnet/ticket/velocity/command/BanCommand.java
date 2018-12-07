@@ -36,6 +36,7 @@ public class BanCommand extends AbstractCommand {
     
     public BanCommand() {
         addAlias("ban");
+        setDescription("Bans a user preventing them from creating Tickets");
         setPermission("ticket.ban.base");
         setUsage("<UniqueId>");
     }

@@ -38,6 +38,7 @@ public class UserCommand extends AbstractCommand {
     
     public UserCommand() {
         addAlias("user");
+        setDescription("Information about the requested User");
         setPermission("ticket.user.base");
         setUsage("<User>");
     }

@@ -41,6 +41,7 @@ public class OpenCommand extends AbstractCommand {
     
     public OpenCommand() {
         addAlias("open");
+        setDescription("Creates a ticket");
         setPermission("ticket.open.base");
         setUsage("<Message>");
     }

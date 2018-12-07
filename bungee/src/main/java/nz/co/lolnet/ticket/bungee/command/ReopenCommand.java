@@ -36,6 +36,7 @@ public class ReopenCommand extends AbstractCommand {
     
     public ReopenCommand() {
         addAlias("reopen");
+        setDescription("Reopens the requested ticket");
         setPermission("ticket.reopen.base");
         setUsage("<Id>");
     }

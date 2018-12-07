@@ -38,6 +38,7 @@ public class CloseCommand extends AbstractCommand {
     
     public CloseCommand() {
         addAlias("close");
+        setDescription("Closes the requested ticket");
         setPermission("ticket.close.base");
         setUsage("<Id> [Message]");
     }

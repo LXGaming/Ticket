@@ -36,6 +36,7 @@ public class PardonCommand extends AbstractCommand {
     public PardonCommand() {
         addAlias("pardon");
         addAlias("unban");
+        setDescription("Pardons a user allowing them to create Tickets");
         setPermission("ticket.pardon.base");
         setUsage("<UniqueId>");
     }

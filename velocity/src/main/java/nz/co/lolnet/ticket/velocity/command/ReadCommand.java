@@ -43,6 +43,7 @@ public class ReadCommand extends AbstractCommand {
     public ReadCommand() {
         addAlias("read");
         addAlias("check");
+        setDescription("Lists Open, Unread tickets or provides details of a specific ticket");
         setPermission("ticket.read.base");
         setUsage("[Id]");
     }

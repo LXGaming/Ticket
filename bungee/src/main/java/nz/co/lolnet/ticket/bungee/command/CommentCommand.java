@@ -39,6 +39,7 @@ public class CommentCommand extends AbstractCommand {
     public CommentCommand() {
         addAlias("comment");
         addAlias("comments");
+        setDescription("Adds a comment to requested ticket");
         setPermission("ticket.comment.base");
         setUsage("<Id> <Message>");
     }
