@@ -31,7 +31,6 @@ import nz.co.lolnet.ticket.api.Platform;
 import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.configuration.Config;
-import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import org.apache.commons.lang3.StringUtils;
 

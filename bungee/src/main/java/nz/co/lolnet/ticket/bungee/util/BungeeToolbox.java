@@ -31,7 +31,6 @@ import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.configuration.Config;
-import nz.co.lolnet.ticket.common.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
