@@ -30,6 +30,7 @@ import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
-        Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
+        Integer ticketId = Toolbox.parseInteger(StringUtils.removeStart(arguments.remove(0), "#")).orElse(null);
         if (ticketId == null) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse ticket id", TextColor.RED)));
             return;

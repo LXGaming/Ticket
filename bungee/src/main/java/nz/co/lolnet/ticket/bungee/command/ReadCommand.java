@@ -86,7 +86,7 @@ public class ReadCommand extends AbstractCommand {
             return;
         }
         
-        Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
+        Integer ticketId = Toolbox.parseInteger(StringUtils.removeStart(arguments.remove(0), "#")).orElse(null);
         if (ticketId == null) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to parse ticket id").color(ChatColor.RED).create());
             return;

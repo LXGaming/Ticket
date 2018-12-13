@@ -30,6 +30,7 @@ import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CloseCommand extends AbstractCommand {
             return;
         }
         
-        Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
+        Integer ticketId = Toolbox.parseInteger(StringUtils.removeStart(arguments.remove(0), "#")).orElse(null);
         if (ticketId == null) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Failed to parse ticket id").color(ChatColor.RED).create());
             return;

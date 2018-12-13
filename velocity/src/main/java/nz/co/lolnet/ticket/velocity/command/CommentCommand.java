@@ -55,7 +55,7 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
-        Integer ticketId = Toolbox.parseInteger(arguments.remove(0)).orElse(null);
+        Integer ticketId = Toolbox.parseInteger(StringUtils.removeStart(arguments.remove(0), "#")).orElse(null);
         if (ticketId == null) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Failed to parse ticket id", TextColor.RED)));
             return;
