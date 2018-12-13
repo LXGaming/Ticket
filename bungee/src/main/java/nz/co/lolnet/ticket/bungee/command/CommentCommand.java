@@ -25,8 +25,11 @@ import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
+import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
@@ -77,10 +80,31 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
+        if (user.isBanned()) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("You have been banned").color(ChatColor.RED).create());
+            return;
+        }
+        
         TicketData ticket = DataManager.getTicket(ticketId).orElse(null);
         if (ticket == null) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("Ticket doesn't exist").color(ChatColor.RED).create());
             return;
+        }
+        
+        if (!user.getUniqueId().equals(ticket.getUser()) && !sender.hasPermission("ticket.comment.others")) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("You are not the owner of that ticket").color(ChatColor.RED).create());
+            return;
+        }
+        
+        if (!sender.hasPermission("ticket.comment.exempt.cooldown")) {
+            long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getCommentDelay).orElse(0L);
+            for (CommentData comment : ticket.getComments()) {
+                long duration = comment.getTimestamp().minusMillis(time).toEpochMilli();
+                if (duration > 0) {
+                    sender.sendMessage(BungeeToolbox.getTextPrefix().append("You need to wait " + (duration / 1000) + " seconds before adding another comment").color(ChatColor.RED).create());
+                    return;
+                }
+            }
         }
         
         CommentData comment = DataManager.createComment(ticket.getId(), user.getUniqueId(), Instant.now(), message).orElse(null);

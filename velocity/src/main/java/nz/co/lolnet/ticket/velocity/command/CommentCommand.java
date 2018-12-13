@@ -23,8 +23,11 @@ import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
+import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
+import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
@@ -77,10 +80,31 @@ public class CommentCommand extends AbstractCommand {
             return;
         }
         
+        if (user.isBanned()) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You have been banned", TextColor.RED)));
+            return;
+        }
+        
         TicketData ticket = DataManager.getTicket(ticketId).orElse(null);
         if (ticket == null) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("Ticket doesn't exist", TextColor.RED)));
             return;
+        }
+        
+        if (!user.getUniqueId().equals(ticket.getUser()) && !source.hasPermission("ticket.comment.others")) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You are not the owner of that ticket", TextColor.RED)));
+            return;
+        }
+        
+        if (!source.hasPermission("ticket.comment.exempt.cooldown")) {
+            long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getCommentDelay).orElse(0L);
+            for (CommentData comment : ticket.getComments()) {
+                long duration = comment.getTimestamp().minusMillis(time).toEpochMilli();
+                if (duration > 0) {
+                    source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You need to wait " + (duration / 1000) + " seconds before adding another comment", TextColor.RED)));
+                    return;
+                }
+            }
         }
         
         CommentData comment = DataManager.createComment(ticket.getId(), user.getUniqueId(), Instant.now(), message).orElse(null);

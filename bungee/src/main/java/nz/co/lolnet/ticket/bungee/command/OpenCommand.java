@@ -89,7 +89,7 @@ public class OpenCommand extends AbstractCommand {
         }
         
         if (!sender.hasPermission("ticket.open.exempt.cooldown")) {
-            long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDelay).orElse(0L);
+            long time = System.currentTimeMillis() - TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getOpenDelay).orElse(0L);
             for (TicketData ticket : tickets) {
                 long duration = ticket.getTimestamp().minusMillis(time).toEpochMilli();
                 if (duration > 0) {
