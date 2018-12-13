@@ -20,10 +20,12 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import net.kyori.text.TextComponent;
+import net.kyori.text.event.ClickEvent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.manager.DataManager;
@@ -48,8 +50,14 @@ public class VelocityListener {
             if (event.getPlayer().hasPermission("ticket.read.others")) {
                 Collection<TicketData> openTickets = DataManager.getCachedOpenTickets();
                 if (!openTickets.isEmpty()) {
-                    event.getPlayer().sendMessage(VelocityToolbox.getTextPrefix()
-                            .append(TextComponent.of("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets"), TextColor.GOLD)));
+                    TextComponent.Builder textBuilder = TextComponent.builder("");
+                    textBuilder.append(VelocityToolbox.getTextPrefix());
+                    textBuilder.append(TextComponent.builder("")
+                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
+                            .append(TextComponent.of("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets"), TextColor.GOLD))
+                            .build());
+                    
+                    event.getPlayer().sendMessage(textBuilder.build());
                 }
             }
             
@@ -71,8 +79,14 @@ public class VelocityListener {
                 return;
             }
             
-            event.getPlayer().sendMessage(VelocityToolbox.getTextPrefix()
-                    .append(TextComponent.of("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"), TextColor.GOLD)));
+            TextComponent.Builder textBuilder = TextComponent.builder("");
+            textBuilder.append(VelocityToolbox.getTextPrefix());
+            textBuilder.append(TextComponent.builder("")
+                    .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
+                    .append(TextComponent.of("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"), TextColor.GOLD))
+                    .build());
+            
+            event.getPlayer().sendMessage(textBuilder.build());
         }).delay(TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS).schedule();
     }
     

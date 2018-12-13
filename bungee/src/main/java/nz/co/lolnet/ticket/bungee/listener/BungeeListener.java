@@ -18,6 +18,7 @@ package nz.co.lolnet.ticket.bungee.listener;
 
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -28,6 +29,7 @@ import net.md_5.bungee.event.EventHandler;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.TicketImpl;
@@ -55,9 +57,14 @@ public class BungeeListener implements Listener {
             if (event.getPlayer().hasPermission("ticket.read.others")) {
                 Collection<TicketData> openTickets = DataManager.getCachedOpenTickets();
                 if (!openTickets.isEmpty()) {
-                    event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix()
+                    ComponentBuilder componentBuilder = new ComponentBuilder("");
+                    componentBuilder.append(BungeeToolbox.getTextPrefix().create());
+                    componentBuilder.append(new ComponentBuilder("")
+                            .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
                             .append("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets")).color(ChatColor.GOLD)
                             .create());
+                    
+                    event.getPlayer().sendMessage(componentBuilder.create());
                 }
             }
             
@@ -79,9 +86,14 @@ public class BungeeListener implements Listener {
                 return;
             }
             
-            event.getPlayer().sendMessage(BungeeToolbox.getTextPrefix()
+            ComponentBuilder componentBuilder = new ComponentBuilder("");
+            componentBuilder.append(BungeeToolbox.getTextPrefix().create());
+            componentBuilder.append(new ComponentBuilder("")
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
                     .append("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets")).color(ChatColor.GOLD)
                     .create());
+            
+            event.getPlayer().sendMessage(componentBuilder.create());
         }, TicketImpl.getInstance().getConfig().map(Config::getLoginDelay).orElse(0L), TimeUnit.MILLISECONDS);
     }
     
