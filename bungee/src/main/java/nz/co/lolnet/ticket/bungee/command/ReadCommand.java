@@ -19,11 +19,13 @@ package nz.co.lolnet.ticket.bungee.command;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
@@ -189,6 +191,7 @@ public class ReadCommand extends AbstractCommand {
     
     private BaseComponent[] buildTicket(TicketData ticket) {
         ComponentBuilder componentBuilder = new ComponentBuilder("")
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read " + ticket.getId()))
                 .append("#" + ticket.getId()).color(ChatColor.GOLD)
                 .append(" " + Toolbox.getShortTimeString(System.currentTimeMillis() - ticket.getTimestamp().toEpochMilli())).color(ChatColor.GREEN)
                 .append(" by ").color(ChatColor.GOLD);

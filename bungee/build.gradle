@@ -17,7 +17,7 @@ targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
 archivesBaseName = "ticket-bungee"
-version = "1.0.2"
+version = "1.0.3"
 
 configurations {
     provided {

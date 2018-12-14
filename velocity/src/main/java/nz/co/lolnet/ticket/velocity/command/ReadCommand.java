@@ -19,12 +19,14 @@ package nz.co.lolnet.ticket.velocity.command;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.text.Components;
 import net.kyori.text.TextComponent;
+import net.kyori.text.event.ClickEvent;
 import net.kyori.text.format.TextColor;
 import net.kyori.text.format.TextDecoration;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Config;
@@ -191,6 +193,7 @@ public class ReadCommand extends AbstractCommand {
     
     private TextComponent buildTicket(TicketData ticket) {
         TextComponent.Builder textBuilder = TextComponent.builder("")
+                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read " + ticket.getId()))
                 .append(TextComponent.of("#" + ticket.getId(), TextColor.GOLD))
                 .append(TextComponent.of(" " + Toolbox.getShortTimeString(System.currentTimeMillis() - ticket.getTimestamp().toEpochMilli()), TextColor.GREEN))
                 .append(TextComponent.of(" by ", TextColor.GOLD));
