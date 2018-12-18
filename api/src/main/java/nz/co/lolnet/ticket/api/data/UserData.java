@@ -16,11 +16,14 @@
 
 package nz.co.lolnet.ticket.api.data;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Objects;
 import java.util.UUID;
 
 public class UserData {
     
+    @SerializedName("unique_id")
     private UUID uniqueId;
     private String name;
     private boolean banned;

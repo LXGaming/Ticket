@@ -17,7 +17,7 @@ targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
 archivesBaseName = "ticket-velocity"
-version = "1.0.3"
+version = "1.0.4"
 
 configurations {
     provided {
