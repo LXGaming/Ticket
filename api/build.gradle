@@ -8,7 +8,7 @@ targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
 archivesBaseName = "ticket-api"
-version = "1.0.4"
+version = version
 
 configurations {
     provided {
