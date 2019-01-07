@@ -24,6 +24,7 @@ configurations {
         compile.extendsFrom(provided)
     }
 
+    compileJava.dependsOn(":common:build")
     jar.enabled = false
     jar.dependsOn("shadowJar")
 }

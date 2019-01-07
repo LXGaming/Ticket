@@ -24,6 +24,7 @@ configurations {
         compile.extendsFrom(provided)
     }
 
+    compileJava.dependsOn(":api:build")
     jar.enabled = false
     jar.dependsOn("shadowJar")
 }
@@ -33,14 +34,17 @@ repositories {
 }
 
 dependencies {
-    shadow(project(path: ":api"))
+    shadow(project(path: ":api")) {
+        exclude(module: "gson")
+    }
+    
+    provided(project(path: ":api"))
     shadow("com.github.ben-manes.caffeine:caffeine:2.6.2")
-    provided("com.google.code.gson:gson:2.8.5")
     provided("com.google.guava:guava:27.0-jre")
     shadow("com.zaxxer:HikariCP:2.6.3") {
         exclude(module: "slf4j-api")
     }
-    
+
     shadow("mysql:mysql-connector-java:5.1.47")
     shadow("org.apache.commons:commons-lang3:3.8.1")
 }
