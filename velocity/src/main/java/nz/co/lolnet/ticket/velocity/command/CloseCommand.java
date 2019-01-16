@@ -19,10 +19,12 @@ package nz.co.lolnet.ticket.velocity.command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
+import net.kyori.text.event.ClickEvent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
@@ -96,12 +98,18 @@ public class CloseCommand extends AbstractCommand {
                 .append(TextComponent.of("Ticket #" + ticket.getId() + " was closed by ", TextColor.GOLD))
                 .append(TextComponent.of(user.getName(), TextColor.YELLOW));
         
+        String command = "/" + Reference.ID + " read " + ticket.getId();
+        
         if (arguments.isEmpty()) {
             // Forces the expiry to be recalculated
             DataManager.getCachedTicket(ticketId);
             Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
             if (player != null) {
                 player.sendMessage(textComponent);
+                player.sendMessage(VelocityToolbox.getTextPrefix()
+                        .append(TextComponent.of("Use ", TextColor.GOLD))
+                        .append(TextComponent.of(command, TextColor.GREEN).clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command)))
+                        .append(TextComponent.of(" to view your ticket", TextColor.GOLD)));
             }
             
             VelocityToolbox.broadcast(player, "ticket.close.notify", textComponent);
@@ -128,6 +136,10 @@ public class CloseCommand extends AbstractCommand {
         Player player = VelocityPlugin.getInstance().getProxy().getPlayer(ticket.getUser()).orElse(null);
         if (player != null) {
             player.sendMessage(textComponent);
+            player.sendMessage(VelocityToolbox.getTextPrefix()
+                    .append(TextComponent.of("Use ", TextColor.GOLD))
+                    .append(TextComponent.of(command, TextColor.GREEN).clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command)))
+                    .append(TextComponent.of(" to view your ticket", TextColor.GOLD)));
         }
         
         VelocityToolbox.broadcast(player, "ticket.close.notify", textComponent);

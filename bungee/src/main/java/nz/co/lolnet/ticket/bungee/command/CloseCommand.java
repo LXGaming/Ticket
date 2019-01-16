@@ -19,10 +19,12 @@ package nz.co.lolnet.ticket.bungee.command;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
@@ -96,12 +98,18 @@ public class CloseCommand extends AbstractCommand {
                 .append("Ticket #" + ticket.getId() + " was closed by ").color(ChatColor.GOLD)
                 .append(user.getName()).color(ChatColor.YELLOW).create();
         
+        String command = "/" + Reference.ID + " read " + ticket.getId();
+        
         if (arguments.isEmpty()) {
             // Forces the expiry to be recalculated
             DataManager.getCachedTicket(ticketId);
             ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(ticket.getUser());
             if (player != null) {
                 player.sendMessage(baseComponents);
+                player.sendMessage(BungeeToolbox.getTextPrefix()
+                        .append("Use ").color(ChatColor.GOLD)
+                        .append(command).color(ChatColor.GREEN).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
+                        .append(" to view your ticket").color(ChatColor.GOLD).create());
             }
             
             BungeeToolbox.broadcast(player, "ticket.close.notify", baseComponents);
@@ -128,6 +136,10 @@ public class CloseCommand extends AbstractCommand {
         ProxiedPlayer player = BungeePlugin.getInstance().getProxy().getPlayer(ticket.getUser());
         if (player != null) {
             player.sendMessage(baseComponents);
+            player.sendMessage(BungeeToolbox.getTextPrefix()
+                    .append("Use ").color(ChatColor.GOLD)
+                    .append(command).color(ChatColor.GREEN).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
+                    .append(" to view your ticket").color(ChatColor.GOLD).create());
         }
         
         BungeeToolbox.broadcast(player, "ticket.close.notify", baseComponents);
