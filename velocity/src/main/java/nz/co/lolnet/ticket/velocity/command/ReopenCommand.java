@@ -22,10 +22,10 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.TicketData;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.VelocityPlugin;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
@@ -69,7 +69,7 @@ public class ReopenCommand extends AbstractCommand {
         
         ticket.setStatus(0);
         ticket.setRead(false);
-        if (!MySQLQuery.updateTicket(ticket)) {
+        if (!TicketImpl.getInstance().getStorage().getQuery().updateTicket(ticket)) {
             source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
             return;
         }

@@ -21,10 +21,10 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 
@@ -78,7 +78,7 @@ public class PardonCommand extends AbstractCommand {
         }
         
         user.setBanned(false);
-        if (MySQLQuery.updateUser(user)) {
+        if (TicketImpl.getInstance().getStorage().getQuery().updateUser(user)) {
             VelocityToolbox.sendRedisMessage("UserPardon", jsonObject -> {
                 jsonObject.add("user", Configuration.getGson().toJsonTree(user));
                 jsonObject.addProperty("by", Ticket.getInstance().getPlatform().getUsername(VelocityToolbox.getUniqueId(source)).orElse("Unknown"));

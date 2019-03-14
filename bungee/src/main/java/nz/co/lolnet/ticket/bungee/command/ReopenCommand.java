@@ -24,10 +24,10 @@ import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.bungee.BungeePlugin;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,7 +69,7 @@ public class ReopenCommand extends AbstractCommand {
         
         ticket.setStatus(0);
         ticket.setRead(false);
-        if (!MySQLQuery.updateTicket(ticket)) {
+        if (!TicketImpl.getInstance().getStorage().getQuery().updateTicket(ticket)) {
             sender.sendMessage(BungeeToolbox.getTextPrefix().append("An error has occurred. Details are available in console.").color(ChatColor.RED).create());
             return;
         }

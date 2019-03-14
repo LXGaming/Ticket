@@ -37,7 +37,6 @@ import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.manager.CommandManager;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import org.apache.commons.lang3.StringUtils;
 
@@ -76,7 +75,7 @@ public class BungeeListener implements Listener {
             if (!StringUtils.equals(user.getName(), event.getPlayer().getName())) {
                 Ticket.getInstance().getLogger().debug("Updating username: {} -> {}", user.getName(), event.getPlayer().getName());
                 user.setName(event.getPlayer().getName());
-                if (!MySQLQuery.updateUser(user)) {
+                if (!TicketImpl.getInstance().getStorage().getQuery().updateUser(user)) {
                     Ticket.getInstance().getLogger().warn("Failed to update {} ({})", user.getName(), user.getUniqueId());
                 }
             }

@@ -24,11 +24,10 @@ import nz.co.lolnet.ticket.api.data.CommentData;
 import nz.co.lolnet.ticket.api.data.LocationData;
 import nz.co.lolnet.ticket.api.data.TicketData;
 import nz.co.lolnet.ticket.api.data.UserData;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.cache.TicketExpiry;
 import nz.co.lolnet.ticket.common.cache.UserExpiry;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
@@ -46,8 +45,8 @@ public class DataManager {
     public static Optional<UserData> getUser(UUID uniqueId) {
         return Optional.ofNullable(getUserCache().get(uniqueId, key -> {
             try {
-                return MySQLQuery.getUser(key).orElse(null);
-            } catch (SQLException ex) {
+                return TicketImpl.getInstance().getStorage().getQuery().getUser(key);
+            } catch (Exception ex) {
                 Ticket.getInstance().getLogger().error("Encountered an error processing DataManager::getUser", ex);
                 return null;
             }
@@ -56,7 +55,7 @@ public class DataManager {
     
     public static Optional<Collection<UserData>> getUsers(String name) {
         try {
-            Collection<UUID> uniqueIds = MySQLQuery.getUsers(name).orElse(null);
+            Collection<UUID> uniqueIds = TicketImpl.getInstance().getStorage().getQuery().getUsers(name);
             if (uniqueIds == null || uniqueIds.isEmpty()) {
                 return Optional.empty();
             }
@@ -64,7 +63,7 @@ public class DataManager {
             Collection<UserData> users = Sets.newHashSet();
             uniqueIds.forEach(uniqueId -> getUser(uniqueId).map(users::add));
             return Optional.of(users);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }
@@ -72,13 +71,13 @@ public class DataManager {
     public static Optional<UserData> getOrCreateUser(UUID uniqueId) {
         return Optional.ofNullable(getUserCache().get(uniqueId, key -> {
             try {
-                UserData user = MySQLQuery.getUser(key).orElse(null);
+                UserData user = TicketImpl.getInstance().getStorage().getQuery().getUser(key);
                 if (user != null) {
                     return user;
                 }
                 
-                return MySQLQuery.createUser(key);
-            } catch (SQLException ex) {
+                return TicketImpl.getInstance().getStorage().getQuery().createUser(key);
+            } catch (Exception ex) {
                 Ticket.getInstance().getLogger().error("Encountered an error processing DataManager::getOrCreateUser", ex);
                 return null;
             }
@@ -124,7 +123,7 @@ public class DataManager {
     
     public static Optional<Collection<TicketData>> getOpenTickets() {
         try {
-            Collection<Integer> ticketIds = MySQLQuery.getOpenTickets().orElse(null);
+            Collection<Integer> ticketIds = TicketImpl.getInstance().getStorage().getQuery().getOpenTickets();
             if (ticketIds == null || ticketIds.isEmpty()) {
                 return Optional.empty();
             }
@@ -132,14 +131,14 @@ public class DataManager {
             Collection<TicketData> tickets = Sets.newTreeSet();
             ticketIds.forEach(ticketId -> getTicket(ticketId).map(tickets::add));
             return Optional.of(tickets);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }
     
     public static Optional<Collection<TicketData>> getUnreadTickets(UUID uniqueId) {
         try {
-            Collection<Integer> ticketIds = MySQLQuery.getUnreadTickets(uniqueId).orElse(null);
+            Collection<Integer> ticketIds = TicketImpl.getInstance().getStorage().getQuery().getUnreadTickets(uniqueId);
             if (ticketIds == null || ticketIds.isEmpty()) {
                 return Optional.empty();
             }
@@ -147,7 +146,7 @@ public class DataManager {
             Collection<TicketData> tickets = Sets.newTreeSet();
             ticketIds.forEach(ticketId -> getTicket(ticketId).map(tickets::add));
             return Optional.of(tickets);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }
@@ -155,13 +154,16 @@ public class DataManager {
     public static Optional<TicketData> getTicket(int ticketId) {
         return Optional.ofNullable(getTicketCache().get(ticketId, key -> {
             try {
-                TicketData ticket = MySQLQuery.getTicket(key).orElse(null);
+                TicketData ticket = TicketImpl.getInstance().getStorage().getQuery().getTicket(key);
                 if (ticket != null) {
-                    MySQLQuery.getComments(ticket.getId()).ifPresent(ticket::setComments);
+                    Collection<CommentData> comments = TicketImpl.getInstance().getStorage().getQuery().getComments(ticket.getId());
+                    if (comments != null) {
+                        ticket.setComments(comments);
+                    }
                 }
                 
                 return ticket;
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 Ticket.getInstance().getLogger().error("Encountered an error processing DataManager::getTicket", ex);
                 return null;
             }
@@ -170,10 +172,10 @@ public class DataManager {
     
     public static Optional<TicketData> createTicket(UUID uniqueId, Instant timestamp, LocationData location, String text) {
         try {
-            TicketData ticket = MySQLQuery.createTicket(uniqueId, timestamp, location, text);
+            TicketData ticket = TicketImpl.getInstance().getStorage().getQuery().createTicket(uniqueId, timestamp, location, text);
             getTicketCache().put(ticket.getId(), ticket);
             return Optional.of(ticket);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }
@@ -185,10 +187,10 @@ public class DataManager {
                 return Optional.empty();
             }
             
-            CommentData comment = MySQLQuery.createComment(ticketId, uniqueId, timestamp, text);
+            CommentData comment = TicketImpl.getInstance().getStorage().getQuery().createComment(ticketId, uniqueId, timestamp, text);
             ticket.getComments().add(comment);
             return Optional.of(comment);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             return Optional.empty();
         }
     }

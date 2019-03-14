@@ -115,6 +115,7 @@ public class VelocityPlugin implements Platform {
     
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
+        TicketImpl.getInstance().getStorage().close();
         Ticket.getInstance().getLogger().info("{} v{} unloaded", Reference.NAME, Reference.VERSION);
     }
     

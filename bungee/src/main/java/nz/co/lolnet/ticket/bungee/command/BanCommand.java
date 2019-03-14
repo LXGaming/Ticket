@@ -21,10 +21,10 @@ import net.md_5.bungee.api.CommandSender;
 import nz.co.lolnet.ticket.api.Ticket;
 import nz.co.lolnet.ticket.api.data.UserData;
 import nz.co.lolnet.ticket.bungee.util.BungeeToolbox;
+import nz.co.lolnet.ticket.common.TicketImpl;
 import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 
 import java.util.List;
@@ -76,7 +76,7 @@ public class BanCommand extends AbstractCommand {
         }
         
         user.setBanned(true);
-        if (MySQLQuery.updateUser(user)) {
+        if (TicketImpl.getInstance().getStorage().getQuery().updateUser(user)) {
             BungeeToolbox.sendRedisMessage("UserBan", jsonObject -> {
                 jsonObject.add("user", Configuration.getGson().toJsonTree(user));
                 jsonObject.addProperty("by", Ticket.getInstance().getPlatform().getUsername(BungeeToolbox.getUniqueId(sender)).orElse("Unknown"));

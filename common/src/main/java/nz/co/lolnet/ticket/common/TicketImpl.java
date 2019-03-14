@@ -23,7 +23,8 @@ import nz.co.lolnet.ticket.api.util.Reference;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.configuration.Configuration;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
+import nz.co.lolnet.ticket.common.storage.Storage;
+import nz.co.lolnet.ticket.common.storage.mysql.MySQLStorage;
 import nz.co.lolnet.ticket.common.util.LoggerImpl;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,6 +34,7 @@ import java.util.Optional;
 public class TicketImpl extends Ticket {
     
     private final Configuration configuration;
+    private final Storage storage;
     private final Map<String, String> legacyCommands;
     
     public TicketImpl(Platform platform) {
@@ -40,6 +42,7 @@ public class TicketImpl extends Ticket {
         this.platform = platform;
         this.logger = new LoggerImpl();
         this.configuration = new Configuration();
+        this.storage = new MySQLStorage();
         this.legacyCommands = Maps.newHashMap();
     }
     
@@ -75,7 +78,18 @@ public class TicketImpl extends Ticket {
             getLegacyCommands().put(StringUtils.defaultIfBlank(command.getReopenTicket(), ""), "reopen");
         });
         
-        if (!MySQLQuery.createTables()) {
+        try {
+            if (!getStorage().connect()) {
+                getLogger().error("Connection failed");
+                return false;
+            }
+            
+            if (!getStorage().getQuery().createTables()) {
+                getLogger().error("Failed to create tables");
+                return false;
+            }
+        } catch (Exception ex) {
+            getLogger().error("Encountered an error while connecting to {}", getStorage().getClass().getSimpleName(), ex);
             return false;
         }
         
@@ -103,6 +117,10 @@ public class TicketImpl extends Ticket {
         }
         
         return Optional.empty();
+    }
+    
+    public Storage getStorage() {
+        return storage;
     }
     
     public Map<String, String> getLegacyCommands() {

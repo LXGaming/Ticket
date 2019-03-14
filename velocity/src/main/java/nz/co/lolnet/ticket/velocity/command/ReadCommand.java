@@ -32,7 +32,6 @@ import nz.co.lolnet.ticket.common.command.AbstractCommand;
 import nz.co.lolnet.ticket.common.configuration.Config;
 import nz.co.lolnet.ticket.common.configuration.category.TicketCategory;
 import nz.co.lolnet.ticket.common.manager.DataManager;
-import nz.co.lolnet.ticket.common.storage.mysql.MySQLQuery;
 import nz.co.lolnet.ticket.common.util.Toolbox;
 import nz.co.lolnet.ticket.velocity.util.VelocityToolbox;
 import org.apache.commons.lang3.StringUtils;
@@ -103,7 +102,7 @@ public class ReadCommand extends AbstractCommand {
         
         if (VelocityToolbox.getUniqueId(source).equals(ticket.getUser())) {
             ticket.setRead(true);
-            if (!MySQLQuery.updateTicket(ticket)) {
+            if (!TicketImpl.getInstance().getStorage().getQuery().updateTicket(ticket)) {
                 source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
                 return;
             }

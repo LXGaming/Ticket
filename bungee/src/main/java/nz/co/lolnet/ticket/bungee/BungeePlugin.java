@@ -89,6 +89,7 @@ public class BungeePlugin extends Plugin implements Platform {
     
     @Override
     public void onDisable() {
+        TicketImpl.getInstance().getStorage().close();
         Ticket.getInstance().getLogger().info("{} v{} unloaded", Reference.NAME, Reference.VERSION);
     }
     
