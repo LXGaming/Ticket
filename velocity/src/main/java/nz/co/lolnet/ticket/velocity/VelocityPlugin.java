@@ -115,6 +115,10 @@ public class VelocityPlugin implements Platform {
     
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
+        if (getProxy().getPluginManager().isLoaded("redisvelocity")) {
+            RedisVelocity.getInstance().unregisterChannels(Reference.ID);
+        }
+        
         TicketImpl.getInstance().getStorage().close();
         Ticket.getInstance().getLogger().info("{} v{} unloaded", Reference.NAME, Reference.VERSION);
     }

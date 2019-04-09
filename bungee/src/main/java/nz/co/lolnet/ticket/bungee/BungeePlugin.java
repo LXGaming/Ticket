@@ -89,6 +89,10 @@ public class BungeePlugin extends Plugin implements Platform {
     
     @Override
     public void onDisable() {
+        if (getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
+            RedisBungee.getApi().unregisterPubSubChannels(Reference.ID);
+        }
+        
         TicketImpl.getInstance().getStorage().close();
         Ticket.getInstance().getLogger().info("{} v{} unloaded", Reference.NAME, Reference.VERSION);
     }
