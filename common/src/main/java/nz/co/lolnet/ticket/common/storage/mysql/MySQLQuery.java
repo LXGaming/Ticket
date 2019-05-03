@@ -103,8 +103,9 @@ public class MySQLQuery implements Query {
                 preparedStatement.setString(2, uniqueId.toString());
                 preparedStatement.setTimestamp(3, Timestamp.from(timestamp));
                 preparedStatement.setString(4, text);
+                preparedStatement.execute();
                 
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (!resultSet.next()) {
                         throw new SQLException("Failed to create Comment");
                     }
@@ -129,8 +130,9 @@ public class MySQLQuery implements Query {
                 preparedStatement.setTimestamp(2, Timestamp.from(timestamp));
                 preparedStatement.setString(3, new Gson().toJson(location));
                 preparedStatement.setString(4, text);
+                preparedStatement.execute();
                 
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                     if (!resultSet.next()) {
                         throw new SQLException("Failed to create Ticket");
                     }
@@ -222,6 +224,7 @@ public class MySQLQuery implements Query {
         try (Connection connection = storage.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(""
                     + "SELECT `id` FROM `ticket` WHERE `status` = ?")) {
+                preparedStatement.setInt(1, 0);
                 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     Collection<Integer> ticketIds = Sets.newTreeSet();
