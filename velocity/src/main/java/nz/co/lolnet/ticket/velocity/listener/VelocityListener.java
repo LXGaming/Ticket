@@ -52,7 +52,7 @@ public class VelocityListener {
                     TextComponent.Builder textBuilder = TextComponent.builder("");
                     textBuilder.append(VelocityToolbox.getTextPrefix());
                     textBuilder.append(TextComponent.builder("")
-                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
                             .append(TextComponent.of("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets"), TextColor.GOLD))
                             .build());
                     
@@ -81,7 +81,7 @@ public class VelocityListener {
             TextComponent.Builder textBuilder = TextComponent.builder("");
             textBuilder.append(VelocityToolbox.getTextPrefix());
             textBuilder.append(TextComponent.builder("")
-                    .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
                     .append(TextComponent.of("You have " + tickets.size() + " unread " + Toolbox.formatUnit(tickets.size(), "ticket", "tickets"), TextColor.GOLD))
                     .build());
             

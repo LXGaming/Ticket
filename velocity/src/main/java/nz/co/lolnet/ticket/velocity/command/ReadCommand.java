@@ -17,7 +17,6 @@
 package nz.co.lolnet.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
-import net.kyori.text.Components;
 import net.kyori.text.TextComponent;
 import net.kyori.text.event.ClickEvent;
 import net.kyori.text.format.TextColor;
@@ -115,12 +114,12 @@ public class ReadCommand extends AbstractCommand {
         textBuilder.append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true));
         textBuilder.append(TextComponent.of(" Ticket #" + ticket.getId() + " ", TextColor.YELLOW).decoration(TextDecoration.STRIKETHROUGH, false));
         textBuilder.append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true));
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         
         textBuilder.append(TextComponent.of("Time", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         textBuilder.append(TextComponent.of(TicketImpl.getInstance().getConfig().map(Config::getTicket).map(TicketCategory::getDateFormat).flatMap(pattern -> Toolbox.formatInstant(pattern, ticket.getTimestamp())).orElse("Unknown")));
         
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Status", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         if (ticket.getStatus() == 0) {
             textBuilder.append(TextComponent.of("Open", TextColor.GREEN));
@@ -128,7 +127,7 @@ public class ReadCommand extends AbstractCommand {
             textBuilder.append(TextComponent.of("Closed", TextColor.RED));
         }
         
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("User", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         UserData user = DataManager.getUser(ticket.getUser()).orElse(null);
         if (user != null) {
@@ -141,7 +140,7 @@ public class ReadCommand extends AbstractCommand {
             textBuilder.append(TextComponent.of("Unknown", TextColor.WHITE));
         }
         
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Location", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         
         if (ticket.getLocation().getX() != null && ticket.getLocation().getY() != null && ticket.getLocation().getZ() != null) {
@@ -155,11 +154,11 @@ public class ReadCommand extends AbstractCommand {
             textBuilder.append(TextComponent.of(" (", TextColor.GRAY)).append(TextComponent.of("" + ticket.getLocation().getDimension(), TextColor.WHITE)).append(TextComponent.of(")", TextColor.GRAY));
         }
         
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Message", TextColor.AQUA)).append(TextComponent.of(": " + ticket.getText(), TextColor.WHITE));
         
         if (!ticket.getComments().isEmpty()) {
-            textBuilder.append(Components.newline());
+            textBuilder.append(TextComponent.newline());
             textBuilder.append(TextComponent.of("Comments", TextColor.AQUA)).append(TextComponent.of(":", TextColor.WHITE));
             source.sendMessage(textBuilder.build());
             
@@ -192,7 +191,7 @@ public class ReadCommand extends AbstractCommand {
     
     private TextComponent buildTicket(TicketData ticket) {
         TextComponent.Builder textBuilder = TextComponent.builder("")
-                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read " + ticket.getId()))
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read " + ticket.getId()))
                 .append(TextComponent.of("#" + ticket.getId(), TextColor.GOLD))
                 .append(TextComponent.of(" " + Toolbox.getShortTimeString(System.currentTimeMillis() - ticket.getTimestamp().toEpochMilli()), TextColor.GREEN))
                 .append(TextComponent.of(" by ", TextColor.GOLD));

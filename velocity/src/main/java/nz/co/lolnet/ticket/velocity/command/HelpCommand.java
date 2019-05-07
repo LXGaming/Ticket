@@ -17,7 +17,6 @@
 package nz.co.lolnet.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
-import net.kyori.text.Components;
 import net.kyori.text.TextComponent;
 import net.kyori.text.event.ClickEvent;
 import net.kyori.text.event.HoverEvent;
@@ -50,8 +49,8 @@ public class HelpCommand extends AbstractCommand {
             }
             
             TextComponent.Builder textBuilder = TextComponent.builder("");
-            textBuilder.clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + Reference.ID + " " + command.getPrimaryAlias().orElse("unknown")));
-            textBuilder.hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, buildDescription(command)));
+            textBuilder.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/" + Reference.ID + " " + command.getPrimaryAlias().orElse("unknown")));
+            textBuilder.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, buildDescription(command)));
             textBuilder.append(TextComponent.of("> ", TextColor.BLUE));
             textBuilder.append(TextComponent.of("/" + Reference.ID + " " + command.getPrimaryAlias().orElse("unknown"), TextColor.GREEN));
             if (StringUtils.isNotBlank(command.getUsage())) {
@@ -66,21 +65,21 @@ public class HelpCommand extends AbstractCommand {
         TextComponent.Builder textBuilder = TextComponent.builder("");
         textBuilder.append(TextComponent.of("Command: ", TextColor.AQUA));
         textBuilder.append(TextComponent.of(StringUtils.capitalize(command.getPrimaryAlias().orElse("unknown")), TextColor.DARK_GREEN));
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Description: ", TextColor.AQUA));
         textBuilder.append(TextComponent.of(StringUtils.defaultIfEmpty(command.getDescription(), "No description provided"), TextColor.DARK_GREEN));
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Usage: ", TextColor.AQUA));
         textBuilder.append(TextComponent.of("/" + Reference.ID + " " + command.getPrimaryAlias().orElse("unknown"), TextColor.DARK_GREEN));
         if (StringUtils.isNotBlank(command.getUsage())) {
             textBuilder.append(TextComponent.of(" " + command.getUsage(), TextColor.DARK_GREEN));
         }
         
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Permission: ", TextColor.AQUA));
         textBuilder.append(TextComponent.of(StringUtils.defaultIfEmpty(command.getPermission(), "None"), TextColor.DARK_GREEN));
-        textBuilder.append(Components.newline());
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Click to auto-complete.", TextColor.GRAY));
         return textBuilder.build();
     }

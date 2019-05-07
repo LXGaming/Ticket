@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.3")
+        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.4")
     }
 }
 
@@ -39,14 +39,14 @@ dependencies {
     }
     
     provided(project(path: ":api"))
-    shadow("com.github.ben-manes.caffeine:caffeine:2.6.2")
+    shadow("com.github.ben-manes.caffeine:caffeine:2.7.0")
     provided("com.google.guava:guava:27.0-jre")
     shadow("com.zaxxer:HikariCP:3.3.1") {
         exclude(module: "slf4j-api")
     }
 
     shadow("mysql:mysql-connector-java:5.1.47")
-    shadow("org.apache.commons:commons-lang3:3.8.1")
+    shadow("org.apache.commons:commons-lang3:3.9")
 }
 
 shadowJar {

@@ -108,7 +108,7 @@ public class CloseCommand extends AbstractCommand {
                 player.sendMessage(textComponent);
                 player.sendMessage(VelocityToolbox.getTextPrefix()
                         .append(TextComponent.of("Use ", TextColor.GOLD))
-                        .append(TextComponent.of(command, TextColor.GREEN).clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command)))
+                        .append(TextComponent.of(command, TextColor.GREEN).clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, command)))
                         .append(TextComponent.of(" to view your ticket", TextColor.GOLD)));
             }
             
@@ -138,7 +138,7 @@ public class CloseCommand extends AbstractCommand {
             player.sendMessage(textComponent);
             player.sendMessage(VelocityToolbox.getTextPrefix()
                     .append(TextComponent.of("Use ", TextColor.GOLD))
-                    .append(TextComponent.of(command, TextColor.GREEN).clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command)))
+                    .append(TextComponent.of(command, TextColor.GREEN).clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, command)))
                     .append(TextComponent.of(" to view your ticket", TextColor.GOLD)));
         }
         

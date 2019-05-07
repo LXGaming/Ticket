@@ -17,7 +17,6 @@
 package nz.co.lolnet.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
-import net.kyori.text.Components;
 import net.kyori.text.TextComponent;
 import net.kyori.text.event.ClickEvent;
 import net.kyori.text.format.TextColor;
@@ -92,7 +91,7 @@ public class UserCommand extends AbstractCommand {
                 .build());
         for (UserData user : users) {
             TextComponent.Builder textBuilder = TextComponent.builder("");
-            textBuilder.clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " " + getPrimaryAlias().orElse("unknown") + " " + user.getUniqueId()));
+            textBuilder.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " " + getPrimaryAlias().orElse("unknown") + " " + user.getUniqueId()));
             textBuilder.append(TextComponent.of("> ", TextColor.BLUE));
             
             if (Ticket.getInstance().getPlatform().isOnline(user.getUniqueId())) {
@@ -112,10 +111,10 @@ public class UserCommand extends AbstractCommand {
         textBuilder.append(TextComponent.of(" User Info: ", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, false));
         textBuilder.append(TextComponent.of(user.getName() + " ", TextColor.YELLOW));
         textBuilder.append(TextComponent.of("----------", TextColor.GREEN).decoration(TextDecoration.STRIKETHROUGH, true));
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         
         textBuilder.append(TextComponent.of("UUID", TextColor.AQUA)).append(TextComponent.of(": " + user.getUniqueId(), TextColor.WHITE));
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         
         textBuilder.append(TextComponent.of("Online", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         if (Ticket.getInstance().getPlatform().isOnline(user.getUniqueId())) {
@@ -124,7 +123,7 @@ public class UserCommand extends AbstractCommand {
             textBuilder.append(TextComponent.of("No", TextColor.RED));
         }
         
-        textBuilder.append(Components.newline());
+        textBuilder.append(TextComponent.newline());
         textBuilder.append(TextComponent.of("Banned", TextColor.AQUA)).append(TextComponent.of(": ", TextColor.WHITE));
         if (user.isBanned()) {
             textBuilder.append(TextComponent.of("Yes", TextColor.RED));
@@ -132,15 +131,15 @@ public class UserCommand extends AbstractCommand {
             textBuilder.append(TextComponent.of("No", TextColor.GREEN));
         }
         
-        textBuilder.append(Components.newline()).append(Components.newline());
+        textBuilder.append(TextComponent.newline()).append(TextComponent.newline());
         textBuilder.append(TextComponent.builder("")
-                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " ban " + user.getUniqueId()))
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " ban " + user.getUniqueId()))
                 .append(TextComponent.of("[", TextColor.GOLD)).append(TextComponent.of("Ban", TextColor.RED)).append(TextComponent.of("]", TextColor.GOLD))
                 .build());
         
-        textBuilder.append(Components.space());
+        textBuilder.append(TextComponent.space());
         textBuilder.append(TextComponent.builder("")
-                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " pardon " + user.getUniqueId()))
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " pardon " + user.getUniqueId()))
                 .append(TextComponent.of("[", TextColor.GOLD)).append(TextComponent.of("Pardon", TextColor.GREEN)).append(TextComponent.of("]", TextColor.GOLD))
                 .build());
         

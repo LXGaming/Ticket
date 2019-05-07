@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.3")
+        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.4")
     }
 }
 
@@ -48,9 +48,9 @@ repositories {
 dependencies {
     shadow(project(path: ":common", configuration: "shadow"))
     provided("com.imaginarycode.minecraft:RedisBungee:0.3.8-INTERIM")
-    provided("net.md-5:bungeecord-api:1.13-SNAPSHOT")
-    provided("nz.co.lolnet:location-api:1.0.0")
-    shadow("org.slf4j:slf4j-nop:1.7.25")
+    provided("net.md-5:bungeecord-api:1.14-SNAPSHOT")
+    provided("nz.co.lolnet:location-api:1.0.4")
+    shadow("org.slf4j:slf4j-nop:1.7.26")
 }
 
 shadowJar {
