@@ -6,7 +6,7 @@ apply plugin: "signing"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "nz.co.lolnet"
+group = "io.github.lxgaming"
 archivesBaseName = "ticket-api"
 version = version
 
@@ -72,14 +72,14 @@ uploadArchives {
                         packaging = "jar"
 
                         scm {
-                            url = "https://github.com/lolnetnz/Ticket"
-                            connection = "scm:git:https://github.com/lolnetnz/Ticket.git"
-                            developerConnection = "scm:git:git@github.com:lolnetnz/Ticket.git"
+                            url = "https://github.com/LXGaming/Ticket"
+                            connection = "scm:git:https://github.com/LXGaming/Ticket.git"
+                            developerConnection = "scm:git:git@github.com:LXGaming/Ticket.git"
                         }
 
                         issueManagement {
                             system = "GitHub Issues"
-                            url = "https://github.com/lolnetnz/Ticket/issues"
+                            url = "https://github.com/LXGaming/Ticket/issues"
                         }
 
                         licenses {

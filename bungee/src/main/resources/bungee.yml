@@ -1,7 +1,7 @@
 name: ${name}
-main: nz.co.lolnet.ticket.bungee.BungeePlugin
+main: io.github.lxgaming.ticket.bungee.BungeePlugin
 version: ${version}
 description: Ticket System
 author: LX_Gaming
-website: https://www.lolnet.co.nz
+website: https://lxgaming.github.io/
 softDepends: [Location, RedisBungee]

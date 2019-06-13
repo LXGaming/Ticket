@@ -15,7 +15,7 @@ apply plugin: "signing"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "nz.co.lolnet"
+group = "io.github.lxgaming"
 archivesBaseName = "ticket-bungee"
 version = version
 
@@ -32,10 +32,6 @@ configurations {
 repositories {
     jcenter()
     maven {
-        name = "lolnet"
-        url = "https://repo.lolnet.co.nz/maven"
-    }
-    maven {
         name = "md-5"
         url = "http://repo.md-5.net/content/repositories/releases"
     }
@@ -49,19 +45,19 @@ dependencies {
     shadow(project(path: ":common", configuration: "shadow"))
     provided("com.imaginarycode.minecraft:RedisBungee:0.3.8-INTERIM")
     provided("net.md-5:bungeecord-api:1.14-SNAPSHOT")
-    provided("nz.co.lolnet:location-api:1.0.4")
+    provided("io.github.lxgaming:location-api:1.0.4")
     shadow("org.slf4j:slf4j-nop:1.7.26")
 }
 
 shadowJar {
     classifier = null
     configurations = [project.configurations.shadow]
-    relocate("com.github.benmanes.caffeine", "nz.co.lolnet.ticket.lib.caffeine")
-    relocate("com.mysql", "nz.co.lolnet.ticket.lib.mysql")
-    relocate("com.zaxxer.hikari", "nz.co.lolnet.ticket.lib.hikari")
-    relocate("org.apache.commons.lang3", "nz.co.lolnet.ticket.lib.lang3")
-    relocate("org.gjt", "nz.co.lolnet.ticket.lib.gjt")
-    relocate("org.slf4j", "nz.co.lolnet.ticket.lib.slf4j")
+    relocate("com.github.benmanes.caffeine", "io.github.lxgaming.ticket.lib.caffeine")
+    relocate("com.mysql", "io.github.lxgaming.ticket.lib.mysql")
+    relocate("com.zaxxer.hikari", "io.github.lxgaming.ticket.lib.hikari")
+    relocate("org.apache.commons.lang3", "io.github.lxgaming.ticket.lib.lang3")
+    relocate("org.gjt", "io.github.lxgaming.ticket.lib.gjt")
+    relocate("org.slf4j", "io.github.lxgaming.ticket.lib.slf4j")
 }
 
 jar {
