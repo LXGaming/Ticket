@@ -1,7 +1,10 @@
-apply plugin: "java"
-apply plugin: "java-library"
-apply plugin: "maven"
-apply plugin: "signing"
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+    id "java"
+    id "java-library"
+    id "maven-publish"
+    id "signing"
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -14,8 +17,6 @@ configurations {
     provided {
         compile.extendsFrom(provided)
     }
-
-    build.dependsOn("uploadArchives")
 }
 
 repositories {
@@ -26,14 +27,44 @@ dependencies {
     api("com.google.code.gson:gson:2.8.5")
 }
 
-task javadocJar(type: Jar) {
+task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = "javadoc"
-    from javadoc
+    from javadoc.destinationDir
 }
 
-task sourcesJar(type: Jar) {
+task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = "sources"
     from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publications = ["mavenPublication"]
+    pkg {
+        repo = "maven"
+        name = "Ticket"
+        licenses = ["Apache-2.0"]
+        vcsUrl = "https://github.com/LXGaming/Ticket.git"
+        publish = true
+        version {
+            name = project.version
+            released = new Date()
+        }
+    }
+}
+
+bintrayUpload {
+    onlyIf { System.getenv("BINTRAY_KEY") != null }
+    onlyIf { System.getenv("BINTRAY_USER") != null }
+    onlyIf { System.getenv("TRAVIS_BUILD_NUMBER") != null }
+    onlyIf { System.getenv("TRAVIS_JOB_NUMBER") ==~ /\d+\.1$/ }
+    onlyIf { System.getenv("TRAVIS_PULL_REQUEST") == "false" }
 }
 
 jar {
@@ -46,52 +77,24 @@ jar {
     }
 }
 
+javadoc {
+    failOnError = false
+}
+
 processResources {
     from("LICENSE")
     rename("LICENSE", "LICENSE-" + archivesBaseName)
 }
 
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-uploadArchives {
-    repositories {
-        if (project.hasProperty("maven.url")) {
-            mavenDeployer {
-                project.logger.lifecycle("Uploading Archives")
-                repository(url: project.property("maven.url"))
-
-                pom {
-                    groupId = project.group
-                    artifactId = project.archivesBaseName
-                    version = project.version
-                    project {
-                        name = project.archivesBaseName
-                        packaging = "jar"
-
-                        scm {
-                            url = "https://github.com/LXGaming/Ticket"
-                            connection = "scm:git:https://github.com/LXGaming/Ticket.git"
-                            developerConnection = "scm:git:git@github.com:LXGaming/Ticket.git"
-                        }
-
-                        issueManagement {
-                            system = "GitHub Issues"
-                            url = "https://github.com/LXGaming/Ticket/issues"
-                        }
-
-                        licenses {
-                            license {
-                                name = "Apache License 2.0"
-                                url = "https://opensource.org/licenses/Apache-2.0"
-                                distribution = "repo"
-                            }
-                        }
-                    }
-                }
-            }
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId archivesBaseName
+            version version
+            artifact javadocJar
+            artifact sourcesJar
         }
     }
 }

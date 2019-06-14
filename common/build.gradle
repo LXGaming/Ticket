@@ -1,16 +1,8 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.4")
-    }
+plugins {
+    id "com.github.johnrengelman.shadow" version "4.0.4"
+    id "java"
+    id "signing"
 }
-
-apply plugin: "com.github.johnrengelman.shadow"
-apply plugin: "java"
-apply plugin: "signing"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -49,13 +41,6 @@ dependencies {
     shadow("org.apache.commons:commons-lang3:3.9")
 }
 
-shadowJar {
-    classifier = null
-    configurations = [project.configurations.shadow]
-    exclude("server-ssl-cert.pem")
-    exclude("Version.java.template")
-}
-
 jar {
     from {
         (configurations.compile - configurations.provided).findAll({
@@ -69,6 +54,13 @@ jar {
 processResources {
     from("LICENSE")
     rename("LICENSE", "LICENSE-" + archivesBaseName)
+}
+
+shadowJar {
+    classifier = null
+    configurations = [project.configurations.shadow]
+    exclude("server-ssl-cert.pem")
+    exclude("Version.java.template")
 }
 
 task signJar {
