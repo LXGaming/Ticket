@@ -69,9 +69,11 @@ shadowJar {
     classifier = null
     configurations = [project.configurations.shadow]
     relocate("com.github.benmanes.caffeine", "io.github.lxgaming.ticket.lib.caffeine")
+    relocate("com.google.errorprone", "io.github.lxgaming.ticket.lib.errorprone")
     relocate("com.mysql", "io.github.lxgaming.ticket.lib.mysql")
     relocate("com.zaxxer.hikari", "io.github.lxgaming.ticket.lib.hikari")
     relocate("org.apache.commons.lang3", "io.github.lxgaming.ticket.lib.lang3")
+    relocate("org.checkerframework", "io.github.lxgaming.ticket.lib.checkerframework")
     relocate("org.gjt", "io.github.lxgaming.ticket.lib.gjt")
     relocate("org.slf4j", "io.github.lxgaming.ticket.lib.slf4j")
 }
