@@ -32,7 +32,7 @@ dependencies {
     
     provided(project(path: ":api"))
     shadow("com.github.ben-manes.caffeine:caffeine:2.7.0")
-    provided("com.google.guava:guava:27.0-jre")
+    provided("com.google.guava:guava:28.0-jre")
     shadow("com.zaxxer:HikariCP:3.3.1") {
         exclude(module: "slf4j-api")
     }
