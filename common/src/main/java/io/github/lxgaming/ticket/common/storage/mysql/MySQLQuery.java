@@ -88,8 +88,7 @@ public class MySQLQuery implements Query {
             
             return true;
         } catch (SQLException ex) {
-            Ticket.getInstance().getLogger().error("Encountered an error processing MySQLQuery::createTables");
-            ex.printStackTrace();
+            Ticket.getInstance().getLogger().error("Encountered an error processing MySQLQuery::createTables", ex);
             return false;
         }
     }
@@ -307,8 +306,7 @@ public class MySQLQuery implements Query {
                 return preparedStatement.executeUpdate() != 0;
             }
         } catch (SQLException ex) {
-            Ticket.getInstance().getLogger().error("Encountered an error processing MySQLQuery::updateTicket");
-            ex.printStackTrace();
+            Ticket.getInstance().getLogger().error("Encountered an error processing MySQLQuery::updateTicket", ex);
             return false;
         }
     }
@@ -323,8 +321,7 @@ public class MySQLQuery implements Query {
                 return preparedStatement.executeUpdate() != 0;
             }
         } catch (SQLException ex) {
-            Ticket.getInstance().getLogger().error("Encountered an error processing MySQLQuery::updateUser");
-            ex.printStackTrace();
+            Ticket.getInstance().getLogger().error("Encountered an error processing MySQLQuery::updateUser", ex);
             return false;
         }
     }
