@@ -99,15 +99,18 @@ public class ReadCommand extends AbstractCommand {
             return;
         }
         
-        if (BungeeToolbox.getUniqueId(sender).equals(ticket.getUser())) {
+        boolean owner = BungeeToolbox.getUniqueId(sender).equals(ticket.getUser());
+        if (!owner && !sender.hasPermission("ticket.read.others")) {
+            sender.sendMessage(BungeeToolbox.getTextPrefix().append("You are not the owner of that ticket").color(ChatColor.RED).create());
+            return;
+        }
+        
+        if (owner && !ticket.isRead()) {
             ticket.setRead(true);
             if (!TicketImpl.getInstance().getStorage().getQuery().updateTicket(ticket)) {
                 sender.sendMessage(BungeeToolbox.getTextPrefix().append("An error has occurred. Details are available in console.").color(ChatColor.RED).create());
                 return;
             }
-        } else if (!sender.hasPermission("ticket.read.others")) {
-            sender.sendMessage(BungeeToolbox.getTextPrefix().append("You are not the owner of that ticket").color(ChatColor.RED).create());
-            return;
         }
         
         ComponentBuilder componentBuilder = new ComponentBuilder("");

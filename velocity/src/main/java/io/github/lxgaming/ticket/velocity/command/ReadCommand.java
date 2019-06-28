@@ -99,15 +99,18 @@ public class ReadCommand extends AbstractCommand {
             return;
         }
         
-        if (VelocityToolbox.getUniqueId(source).equals(ticket.getUser())) {
+        boolean owner = VelocityToolbox.getUniqueId(source).equals(ticket.getUser());
+        if (!owner && !source.hasPermission("ticket.read.others")) {
+            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You are not the owner of that ticket", TextColor.RED)));
+            return;
+        }
+        
+        if (owner && !ticket.isRead()) {
             ticket.setRead(true);
             if (!TicketImpl.getInstance().getStorage().getQuery().updateTicket(ticket)) {
                 source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("An error has occurred. Details are available in console.", TextColor.RED)));
                 return;
             }
-        } else if (!source.hasPermission("ticket.read.others")) {
-            source.sendMessage(VelocityToolbox.getTextPrefix().append(TextComponent.of("You are not the owner of that ticket", TextColor.RED)));
-            return;
         }
         
         TextComponent.Builder textBuilder = TextComponent.builder("");
