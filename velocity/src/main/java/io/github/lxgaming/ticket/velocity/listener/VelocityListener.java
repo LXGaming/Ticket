@@ -53,7 +53,7 @@ public class VelocityListener {
                     textBuilder.append(VelocityToolbox.getTextPrefix());
                     textBuilder.append(TextComponent.builder("")
                             .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
-                            .append(TextComponent.of("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets"), TextColor.GOLD))
+                            .append(TextComponent.of("There " + Toolbox.formatUnit(openTickets.size(), "is", "are") + " currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets"), TextColor.GOLD))
                             .build());
                     
                     event.getPlayer().sendMessage(textBuilder.build());

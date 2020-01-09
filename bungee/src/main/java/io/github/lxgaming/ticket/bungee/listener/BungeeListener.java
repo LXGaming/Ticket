@@ -60,7 +60,7 @@ public class BungeeListener implements Listener {
                     componentBuilder.append(BungeeToolbox.getTextPrefix().create());
                     componentBuilder.append(new ComponentBuilder("")
                             .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Reference.ID + " read"))
-                            .append("There is currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets")).color(ChatColor.GOLD)
+                            .append("There " + Toolbox.formatUnit(openTickets.size(), "is", "are") + " currently " + openTickets.size() + " open " + Toolbox.formatUnit(openTickets.size(), "ticket", "tickets")).color(ChatColor.GOLD)
                             .create());
                     
                     event.getPlayer().sendMessage(componentBuilder.create());
