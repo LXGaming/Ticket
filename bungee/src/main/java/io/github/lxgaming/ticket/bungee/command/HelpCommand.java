@@ -16,16 +16,16 @@
 
 package io.github.lxgaming.ticket.bungee.command;
 
+import io.github.lxgaming.ticket.api.util.Reference;
+import io.github.lxgaming.ticket.bungee.util.BungeeToolbox;
+import io.github.lxgaming.ticket.common.command.AbstractCommand;
+import io.github.lxgaming.ticket.common.manager.CommandManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import io.github.lxgaming.ticket.api.util.Reference;
-import io.github.lxgaming.ticket.bungee.util.BungeeToolbox;
-import io.github.lxgaming.ticket.common.command.AbstractCommand;
-import io.github.lxgaming.ticket.common.manager.CommandManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;

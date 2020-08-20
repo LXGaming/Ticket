@@ -19,8 +19,6 @@ package io.github.lxgaming.ticket.velocity.listener;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.proxy.Player;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
 import io.github.lxgaming.redisvelocity.api.event.RedisMessageEvent;
 import io.github.lxgaming.ticket.api.Ticket;
 import io.github.lxgaming.ticket.api.data.TicketData;
@@ -32,6 +30,8 @@ import io.github.lxgaming.ticket.common.manager.DataManager;
 import io.github.lxgaming.ticket.common.util.Toolbox;
 import io.github.lxgaming.ticket.velocity.VelocityPlugin;
 import io.github.lxgaming.ticket.velocity.util.VelocityToolbox;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 import org.apache.commons.lang3.StringUtils;
 
 public class RedisListener {

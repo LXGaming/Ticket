@@ -16,9 +16,6 @@
 
 package io.github.lxgaming.ticket.bungee.command;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import io.github.lxgaming.location.api.Location;
 import io.github.lxgaming.ticket.api.data.LocationData;
 import io.github.lxgaming.ticket.api.data.TicketData;
@@ -32,6 +29,9 @@ import io.github.lxgaming.ticket.common.configuration.Configuration;
 import io.github.lxgaming.ticket.common.configuration.category.TicketCategory;
 import io.github.lxgaming.ticket.common.manager.DataManager;
 import io.github.lxgaming.ticket.common.util.Toolbox;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.time.Instant;
 import java.util.Collection;

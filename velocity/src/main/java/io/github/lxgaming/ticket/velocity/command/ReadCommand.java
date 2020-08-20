@@ -17,10 +17,6 @@
 package io.github.lxgaming.ticket.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
-import net.kyori.text.TextComponent;
-import net.kyori.text.event.ClickEvent;
-import net.kyori.text.format.TextColor;
-import net.kyori.text.format.TextDecoration;
 import io.github.lxgaming.ticket.api.Ticket;
 import io.github.lxgaming.ticket.api.data.CommentData;
 import io.github.lxgaming.ticket.api.data.TicketData;
@@ -33,6 +29,10 @@ import io.github.lxgaming.ticket.common.configuration.category.TicketCategory;
 import io.github.lxgaming.ticket.common.manager.DataManager;
 import io.github.lxgaming.ticket.common.util.Toolbox;
 import io.github.lxgaming.ticket.velocity.util.VelocityToolbox;
+import net.kyori.text.TextComponent;
+import net.kyori.text.event.ClickEvent;
+import net.kyori.text.format.TextColor;
+import net.kyori.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;

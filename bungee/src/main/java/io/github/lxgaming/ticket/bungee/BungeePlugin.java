@@ -17,9 +17,6 @@
 package io.github.lxgaming.ticket.bungee;
 
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Plugin;
 import io.github.lxgaming.ticket.api.Platform;
 import io.github.lxgaming.ticket.api.Ticket;
 import io.github.lxgaming.ticket.api.util.Logger;
@@ -41,6 +38,9 @@ import io.github.lxgaming.ticket.bungee.listener.RedisListener;
 import io.github.lxgaming.ticket.common.TicketImpl;
 import io.github.lxgaming.ticket.common.configuration.Config;
 import io.github.lxgaming.ticket.common.manager.CommandManager;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.nio.file.Path;
 import java.util.Optional;
