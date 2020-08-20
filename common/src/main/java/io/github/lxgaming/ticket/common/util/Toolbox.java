@@ -17,8 +17,8 @@
 package io.github.lxgaming.ticket.common.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,6 +30,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class Toolbox {
+    
+    public static final Gson GSON = new GsonBuilder()
+            .disableHtmlEscaping()
+            .enableComplexMapKeySerialization()
+            .create();
     
     public static String convertColor(String string) {
         return string.replaceAll("(?i)\u00A7([0-9A-FK-OR])", "\u0026$1");
@@ -155,7 +160,7 @@ public class Toolbox {
     
     public static <T> Optional<T> parseJson(String json, Class<T> type) {
         try {
-            return parseJson(new JsonParser().parse(json), type);
+            return Optional.ofNullable(GSON.fromJson(json, type));
         } catch (RuntimeException ex) {
             return Optional.empty();
         }
@@ -163,7 +168,7 @@ public class Toolbox {
     
     public static <T> Optional<T> parseJson(JsonElement jsonElement, Class<T> type) {
         try {
-            return Optional.of(new Gson().fromJson(jsonElement, type));
+            return Optional.ofNullable(GSON.fromJson(jsonElement, type));
         } catch (RuntimeException ex) {
             return Optional.empty();
         }

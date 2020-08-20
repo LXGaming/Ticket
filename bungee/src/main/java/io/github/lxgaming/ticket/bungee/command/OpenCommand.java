@@ -105,7 +105,10 @@ public class OpenCommand extends AbstractCommand {
                 location.setX(locationUser.getX());
                 location.setY(locationUser.getY());
                 location.setZ(locationUser.getZ());
-                location.setDimension(locationUser.getDimension());
+                if (locationUser.getDimension() != null) {
+                    location.setDimension(locationUser.getDimension().getId());
+                }
+                
                 location.setServer(locationUser.getServer());
             });
         } else {

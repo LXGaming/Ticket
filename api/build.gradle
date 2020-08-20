@@ -1,9 +1,9 @@
 plugins {
-    id "com.jfrog.bintray" version "1.8.4"
+    id "com.jfrog.bintray" version "1.8.5"
     id "java"
     id "java-library"
     id "maven-publish"
-    id "signing"
+    id "net.kyori.blossom" version "1.1.0"
 }
 
 sourceCompatibility = 1.8
@@ -13,10 +13,11 @@ group = "io.github.lxgaming"
 archivesBaseName = "ticket-api"
 version = version
 
+blossom {
+    replaceToken("@version@", version)
+}
+
 configurations {
-    provided {
-        compile.extendsFrom(provided)
-    }
 }
 
 repositories {
@@ -24,16 +25,16 @@ repositories {
 }
 
 dependencies {
-    api("com.google.code.gson:gson:2.8.5")
+    api("com.google.code.gson:gson:${gsonVersion}")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from sourceSets.main.allSource
 }
 
@@ -64,23 +65,13 @@ bintrayUpload {
     onlyIf { System.getenv("BINTRAY_USER") != null }
 }
 
-jar {
-    from {
-        (configurations.compile - configurations.provided).findAll({
-            it.isDirectory() || it.name.endsWith(".jar")
-        }).collect({
-            it.isDirectory() ? it : zipTree(it)
-        })
-    }
-}
-
 javadoc {
     failOnError = false
 }
 
 processResources {
-    from("LICENSE")
-    rename("LICENSE", "LICENSE-" + archivesBaseName)
+    from("../LICENSE")
+    rename("LICENSE", "LICENSE-Ticket")
 }
 
 publishing {
@@ -92,38 +83,6 @@ publishing {
             version version
             artifact javadocJar
             artifact sourcesJar
-        }
-    }
-}
-
-task signJar {
-    doFirst {
-        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
-            project.logger.warn("========== [WARNING] ==========")
-            project.logger.warn("")
-            project.logger.warn("   This build is not signed!   ")
-            project.logger.warn("")
-            project.logger.warn("========== [WARNING] ==========")
-            throw new StopExecutionException()
-        }
-    }
-
-    doLast {
-        configurations.archives.allArtifacts.files.each {
-            ant.signjar(
-                jar: it,
-                alias: project.property("signing.alias"),
-                storepass: project.property("signing.keyStorePassword"),
-                keystore: project.property("signing.keyStorePath"),
-                keypass: project.property("signing.keyStorePassword"),
-                preservelastmodified: project.property("signing.preserveLastModified"),
-                tsaurl: project.property("signing.timestampAuthority"),
-                digestalg: project.property("signing.digestAlgorithm")
-            )
-            project.logger.lifecycle("JAR Signed: " + it.name)
-
-            signing.sign(it)
-            project.logger.lifecycle("PGP Signed: " + it.name)
         }
     }
 }
