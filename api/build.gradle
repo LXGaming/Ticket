@@ -63,7 +63,7 @@ publishing {
             artifact sourcesJar
             pom {
                 name = "Ticket"
-                description = "Ticketing System for BungeeCord and Velocity "
+                description = "Ticketing System for BungeeCord and Velocity"
                 url = "https://github.com/LXGaming/Ticket"
                 developers {
                     developer {
