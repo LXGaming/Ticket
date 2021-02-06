@@ -1,9 +1,9 @@
 plugins {
-    id "com.jfrog.bintray" version "1.8.5"
     id "java"
     id "java-library"
     id "maven-publish"
     id "net.kyori.blossom" version "1.1.0"
+    id "signing"
 }
 
 sourceCompatibility = 1.8
@@ -21,7 +21,7 @@ configurations {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -43,28 +43,6 @@ artifacts {
     archives sourcesJar
 }
 
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publications = ["mavenPublication"]
-    pkg {
-        repo = "maven"
-        name = "Ticket"
-        licenses = ["Apache-2.0"]
-        vcsUrl = "https://github.com/LXGaming/Ticket.git"
-        publish = true
-        version {
-            name = project.version
-            released = new Date()
-        }
-    }
-}
-
-bintrayUpload {
-    onlyIf { System.getenv("BINTRAY_KEY") != null }
-    onlyIf { System.getenv("BINTRAY_USER") != null }
-}
-
 javadoc {
     failOnError = false
 }
@@ -83,6 +61,48 @@ publishing {
             version version
             artifact javadocJar
             artifact sourcesJar
+            pom {
+                name = "Ticket"
+                description = "Ticketing System for BungeeCord and Velocity "
+                url = "https://github.com/LXGaming/Ticket"
+                developers {
+                    developer {
+                        id = "lxgaming"
+                        name = "LXGaming"
+                    }
+                }
+                issueManagement {
+                    system = "GitHub Issues"
+                    url = "https://github.com/LXGaming/Ticket/issues"
+                }
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                scm {
+                    connection = "scm:git@github.com:LXGaming/Ticket.git"
+                    developerConnection = "scm:git@github.com:LXGaming/Ticket.git"
+                    url = "https://github.com/LXGaming/Ticket"
+                }
+            }
         }
     }
+    repositories {
+        if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {
+            maven {
+                name = "sonatype"
+                url = version.contains("-SNAPSHOT") ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                credentials {
+                    username project.property("sonatype.username")
+                    password project.property("sonatype.password")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
 }
