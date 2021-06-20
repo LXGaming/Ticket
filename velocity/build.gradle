@@ -1,29 +1,16 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "java"
-    id "signing"
+    id "com.github.johnrengelman.shadow"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "ticket-velocity"
-version = version
 
 configurations {
-    build.dependsOn("signJar")
-    compileJava.dependsOn(":common:build")
-    jar.enabled = false
-    jar.dependsOn("shadowJar")
 }
 
 repositories {
-    mavenCentral()
-    maven {
-        name = "velocity"
-        url = "https://repo.velocitypowered.com/snapshots"
-    }
 }
 
 dependencies {
@@ -35,9 +22,22 @@ dependencies {
         exclude(module: "slf4j-api")
     }
     annotationProcessor("com.velocitypowered:velocity-api:${velocityVersion}")
-    compile("com.velocitypowered:velocity-api:${velocityVersion}")
-    compile("io.github.lxgaming:location-api:${locationVersion}")
-    compile("io.github.lxgaming:redisvelocity-api:1.2.0")
+    compileOnly("com.velocitypowered:velocity-api:${velocityVersion}")
+    compileOnly("io.github.lxgaming:location-api:${locationVersion}")
+    compileOnly("io.github.lxgaming:redisvelocity-api:1.2.0")
+}
+
+build {
+    dependsOn("signJar")
+}
+
+compileJava {
+    dependsOn(":common:build")
+}
+
+jar {
+    enabled = false
+    dependsOn("shadowJar")
 }
 
 shadowJar {
@@ -47,41 +47,10 @@ shadowJar {
     exclude("Version.java.template")
     relocate("com.github.benmanes.caffeine", "io.github.lxgaming.ticket.lib.caffeine")
     relocate("com.google.errorprone", "io.github.lxgaming.ticket.lib.errorprone")
+    relocate("com.google.protobuf", "io.github.lxgaming.ticket.lib.protobuf")
     relocate("com.mysql", "io.github.lxgaming.ticket.lib.mysql")
     relocate("com.zaxxer.hikari", "io.github.lxgaming.ticket.lib.hikari")
     relocate("org.apache.commons.lang3", "io.github.lxgaming.ticket.lib.lang3")
     relocate("org.checkerframework", "io.github.lxgaming.ticket.lib.checkerframework")
     relocate("org.gjt", "io.github.lxgaming.ticket.lib.gjt")
-}
-
-task signJar {
-    doFirst {
-        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
-            project.logger.warn("========== [WARNING] ==========")
-            project.logger.warn("")
-            project.logger.warn("   This build is not signed!   ")
-            project.logger.warn("")
-            project.logger.warn("========== [WARNING] ==========")
-            throw new StopExecutionException()
-        }
-    }
-
-    doLast {
-        configurations.archives.allArtifacts.files.each {
-            ant.signjar(
-                jar: it,
-                alias: project.property("signing.alias"),
-                storepass: project.property("signing.keyStorePassword"),
-                keystore: project.property("signing.keyStorePath"),
-                keypass: project.property("signing.keyStorePassword"),
-                preservelastmodified: project.property("signing.preserveLastModified"),
-                tsaurl: project.property("signing.timestampAuthority"),
-                digestalg: project.property("signing.digestAlgorithm")
-            )
-            project.logger.lifecycle("JAR Signed: " + it.name)
-
-            signing.sign(it)
-            project.logger.lifecycle("PGP Signed: " + it.name)
-        }
-    }
 }

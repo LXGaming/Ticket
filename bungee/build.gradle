@@ -1,33 +1,16 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "java"
-    id "signing"
+    id "com.github.johnrengelman.shadow"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "ticket-bungee"
-version = version
 
 configurations {
-    build.dependsOn("signJar")
-    compileJava.dependsOn(":common:build")
-    jar.enabled = false
-    jar.dependsOn("shadowJar")
 }
 
 repositories {
-    mavenCentral()
-    maven {
-        name = "md-5"
-        url = "https://repo.md-5.net/content/repositories/releases"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/repositories/snapshots"
-    }
 }
 
 dependencies {
@@ -37,13 +20,27 @@ dependencies {
         exclude(module: "netty-all")
         exclude(module: "slf4j-api")
     }
-    compile("com.imaginarycode.minecraft:RedisBungee:0.3.8-INTERIM")
-    compile("io.github.lxgaming:location-api:${locationVersion}")
-    compile("net.md-5:bungeecord-api:${bungeecordVersion}")
+    compileOnly("com.imaginarycode.minecraft:RedisBungee:0.3.8-INTERIM")
+    compileOnly("io.github.lxgaming:location-api:${locationVersion}")
+    compileOnly("net.md-5:bungeecord-api:${bungeecordVersion}")
     shadow("org.slf4j:slf4j-nop:${slf4jVersion}")
 }
 
+build {
+    dependsOn("signJar")
+}
+
+compileJava {
+    dependsOn(":common:build")
+}
+
+jar {
+    enabled = false
+    dependsOn("shadowJar")
+}
+
 processResources {
+    duplicatesStrategy(DuplicatesStrategy.INCLUDE)
     from (sourceSets.main.resources.srcDirs) {
         include("bungee.yml")
         expand("name": "Ticket", "version": version)
@@ -57,42 +54,11 @@ shadowJar {
     exclude("Version.java.template")
     relocate("com.github.benmanes.caffeine", "io.github.lxgaming.ticket.lib.caffeine")
     relocate("com.google.errorprone", "io.github.lxgaming.ticket.lib.errorprone")
+    relocate("com.google.protobuf", "io.github.lxgaming.ticket.lib.protobuf")
     relocate("com.mysql", "io.github.lxgaming.ticket.lib.mysql")
     relocate("com.zaxxer.hikari", "io.github.lxgaming.ticket.lib.hikari")
     relocate("org.apache.commons.lang3", "io.github.lxgaming.ticket.lib.lang3")
     relocate("org.checkerframework", "io.github.lxgaming.ticket.lib.checkerframework")
     relocate("org.gjt", "io.github.lxgaming.ticket.lib.gjt")
     relocate("org.slf4j", "io.github.lxgaming.ticket.lib.slf4j")
-}
-
-task signJar {
-    doFirst {
-        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
-            project.logger.warn("========== [WARNING] ==========")
-            project.logger.warn("")
-            project.logger.warn("   This build is not signed!   ")
-            project.logger.warn("")
-            project.logger.warn("========== [WARNING] ==========")
-            throw new StopExecutionException()
-        }
-    }
-
-    doLast {
-        configurations.archives.allArtifacts.files.each {
-            ant.signjar(
-                jar: it,
-                alias: project.property("signing.alias"),
-                storepass: project.property("signing.keyStorePassword"),
-                keystore: project.property("signing.keyStorePath"),
-                keypass: project.property("signing.keyStorePassword"),
-                preservelastmodified: project.property("signing.preserveLastModified"),
-                tsaurl: project.property("signing.timestampAuthority"),
-                digestalg: project.property("signing.digestAlgorithm")
-            )
-            project.logger.lifecycle("JAR Signed: " + it.name)
-
-            signing.sign(it)
-            project.logger.lifecycle("PGP Signed: " + it.name)
-        }
-    }
 }

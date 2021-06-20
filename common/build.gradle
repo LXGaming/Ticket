@@ -1,21 +1,16 @@
 plugins {
-    id "java"
     id "java-library"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "ticket-common"
-version = version
 
 configurations {
-    compileJava.dependsOn(":api:build")
 }
 
 repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -27,6 +22,10 @@ dependencies {
     }
     api("mysql:mysql-connector-java:${mysqlVersion}")
     api("org.apache.commons:commons-lang3:${lang3Version}")
+}
+
+compileJava {
+    dependsOn(":api:build")
 }
 
 test {

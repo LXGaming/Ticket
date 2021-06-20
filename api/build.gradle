@@ -1,17 +1,13 @@
 plugins {
-    id "java"
     id "java-library"
     id "maven-publish"
-    id "net.kyori.blossom" version "1.1.0"
-    id "signing"
+    id "net.kyori.blossom"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "ticket-api"
-version = version
 
 blossom {
     replaceToken("@version@", version)
@@ -21,26 +17,15 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
 }
 
 dependencies {
     api("com.google.code.gson:gson:${gsonVersion}")
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.set("javadoc")
-    from javadoc.destinationDir
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set("sources")
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 javadoc {
@@ -59,8 +44,6 @@ publishing {
             groupId group
             artifactId archivesBaseName
             version version
-            artifact javadocJar
-            artifact sourcesJar
             pom {
                 name = "Ticket"
                 description = "Ticketing System for BungeeCord and Velocity"
