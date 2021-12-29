@@ -65,8 +65,8 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git@github.com:LXGaming/Ticket.git"
-                    developerConnection = "scm:git@github.com:LXGaming/Ticket.git"
+                    connection = "scm:git:https://github.com/LXGaming/Ticket.git"
+                    developerConnection = "scm:git:https://github.com/LXGaming/Ticket.git"
                     url = "https://github.com/LXGaming/Ticket"
                 }
             }
