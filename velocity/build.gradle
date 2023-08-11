@@ -21,8 +21,12 @@ dependencies {
         exclude(module: "netty-all")
         exclude(module: "slf4j-api")
     }
-    annotationProcessor("com.velocitypowered:velocity-api:${velocityVersion}")
-    compileOnly("com.velocitypowered:velocity-api:${velocityVersion}")
+    annotationProcessor("com.velocitypowered:velocity-api:${velocityVersion}") {
+        exclude(module: "adventure-text-serializer-legacy-text3")
+    }
+    compileOnly("com.velocitypowered:velocity-api:${velocityVersion}") {
+        exclude(module: "adventure-text-serializer-legacy-text3")
+    }
     compileOnly("io.github.lxgaming:location-api:${locationVersion}")
     compileOnly("io.github.lxgaming:redisvelocity-api:1.2.0")
 }
